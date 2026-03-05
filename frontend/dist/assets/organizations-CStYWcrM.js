@@ -1,0 +1,1 @@
+import{a as s}from"./index-BpYqVbw6.js";const p={list:()=>s.get("/api/orgs/"),create:i=>s.post("/api/orgs/",i),switch:i=>s.post(`/api/orgs/${i}/switch/`),invite:(i,o)=>s.post(`/api/orgs/${i}/invite/`,o)};export{p as o};
