@@ -1,0 +1,67 @@
+{
+  "name": "FitTrack",
+  "short_name": "FitTrack",
+  "description": "Your personal fitness tracking SaaS",
+  "theme_color": "#6366f1",
+  "background_color": "#0f172a",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Log Workout",
+      "url": "/workouts",
+      "description": "Start or log a workout"
+    },
+    {
+      "name": "Log Food",
+      "url": "/nutrition",
+      "description": "Log today's food"
+    },
+    {
+      "name": "Log Weight",
+      "url": "/progress",
+      "description": "Log your current weight"
+    }
+  ],
+  "categories": ["health", "fitness", "lifestyle"]
+}

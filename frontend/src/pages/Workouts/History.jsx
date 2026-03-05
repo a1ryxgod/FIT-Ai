@@ -1,0 +1,95 @@
+import { useState } from 'react'
+import Layout from '@/components/layout/Layout'
+import Card, { CardHeader } from '@/components/ui/Card'
+import Spinner from '@/components/ui/Spinner'
+import EmptyState from '@/components/ui/EmptyState'
+import Button from '@/components/ui/Button'
+import { useWorkoutHistory } from '@/hooks/useWorkouts'
+import { formatDate } from '@/utils/helpers'
+import { useNavigate } from 'react-router-dom'
+
+export default function WorkoutHistory() {
+  const navigate = useNavigate()
+  const [page, setPage] = useState(1)
+  const { data, isLoading } = useWorkoutHistory({ page, page_size: 10 })
+
+  const sessions = data?.results ?? []
+  const totalPages = Math.ceil((data?.count ?? 0) / 10)
+
+  return (
+    <Layout title="Workout History">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-lg font-semibold text-slate-100">History</h2>
+        <Button onClick={() => navigate('/workouts')} variant="secondary" size="sm">
+          Back
+        </Button>
+      </div>
+
+      {isLoading ? (
+        <div className="flex justify-center py-12"><Spinner /></div>
+      ) : sessions.length === 0 ? (
+        <EmptyState
+          icon="📊"
+          title="No workout history"
+          description="Complete your first workout to see it here"
+          action="Start Workout"
+          onAction={() => navigate('/workouts')}
+        />
+      ) : (
+        <>
+          <div className="space-y-4">
+            {sessions.map((session) => (
+              <Card key={session.id}>
+                <CardHeader
+                  title={formatDate(session.date)}
+                  subtitle={session.program ? `Program: ${session.program}` : 'Free session'}
+                  action={
+                    <span className={`badge ${session.is_active ? 'bg-emerald-500/20 text-emerald-300' : 'bg-surface-700 text-slate-400'}`}>
+                      {session.is_active ? 'Active' : 'Completed'}
+                    </span>
+                  }
+                />
+                {session.sets && session.sets.length > 0 ? (
+                  <div className="space-y-1.5 mt-2">
+                    {session.sets.map((set, i) => (
+                      <div key={set.id ?? i} className="flex items-center justify-between text-sm">
+                        <span className="text-slate-300">{set.exercise?.name ?? 'Exercise'}</span>
+                        <span className="text-slate-400">{set.reps} × {set.weight}kg</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-slate-500 mt-1">No sets recorded</p>
+                )}
+              </Card>
+            ))}
+          </div>
+
+          {totalPages > 1 && (
+            <div className="flex justify-center gap-2 mt-6">
+              <Button
+                variant="secondary"
+                size="sm"
+                disabled={page === 1}
+                onClick={() => setPage((p) => p - 1)}
+              >
+                Previous
+              </Button>
+              <span className="flex items-center text-sm text-slate-400">
+                {page} / {totalPages}
+              </span>
+              <Button
+                variant="secondary"
+                size="sm"
+                disabled={page >= totalPages}
+                onClick={() => setPage((p) => p + 1)}
+              >
+                Next
+              </Button>
+            </div>
+          )}
+        </>
+      )}
+    </Layout>
+  )
+}

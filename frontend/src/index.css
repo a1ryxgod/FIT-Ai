@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── White-Label CSS Variables (default: fitness red) ─── */
+:root {
+  --brand-50:  255 237 236;
+  --brand-100: 255 214 212;
+  --brand-200: 255 171 167;
+  --brand-300: 255 120 113;
+  --brand-400: 255 80  72;
+  --brand-500: 255 59  48;   /* #FF3B30 */
+  --brand-600: 220 40  30;
+  --brand-700: 180 25  18;
+}
+
+@layer base {
+  html { @apply antialiased; }
+  body { @apply bg-surface-950 text-slate-100 font-sans text-body; }
+  * { @apply box-border; }
+
+  /* Typography scale */
+  h1 { @apply text-h1 text-white; }
+  h2 { @apply text-h2 text-white; }
+  h3 { @apply text-h3 text-slate-100; }
+
+  ::-webkit-scrollbar { @apply w-1; }
+  ::-webkit-scrollbar-track { @apply bg-surface-900; }
+  ::-webkit-scrollbar-thumb { @apply bg-surface-600 rounded-full; }
+}
+
+@layer components {
+  /* Cards */
+  .card {
+    @apply bg-surface-800 rounded-2xl border border-surface-700/60 p-4 shadow-card;
+  }
+  .card-interactive {
+    @apply card cursor-pointer hover:border-brand-500/40 hover:shadow-card-hover transition-all duration-200;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    @apply bg-brand-500 hover:bg-brand-600 active:bg-brand-700 text-white font-semibold
+           px-5 py-3 rounded-xl transition-all duration-150 shadow-brand
+           disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none
+           focus:outline-none focus:ring-2 focus:ring-brand-400 focus:ring-offset-2 focus:ring-offset-surface-900;
+  }
+  .btn-secondary {
+    @apply bg-surface-700 hover:bg-surface-600 active:bg-surface-750 text-slate-100 font-medium
+           px-5 py-3 rounded-xl transition-all duration-150
+           focus:outline-none focus:ring-2 focus:ring-surface-500;
+  }
+  .btn-ghost {
+    @apply hover:bg-surface-700 text-slate-400 hover:text-slate-100 font-medium
+           px-4 py-2.5 rounded-xl transition-colors;
+  }
+  .btn-danger {
+    @apply bg-danger/10 hover:bg-danger/20 text-danger font-medium
+           px-5 py-3 rounded-xl transition-all border border-danger/30;
+  }
+
+  /* Inputs */
+  .input {
+    @apply w-full bg-surface-800 border border-surface-600 text-slate-100 placeholder-slate-600
+           rounded-xl px-4 py-3 text-small
+           focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500/50
+           transition-all duration-150;
+  }
+  .label {
+    @apply block text-caption font-medium text-slate-400 mb-1.5 uppercase tracking-wide;
+  }
+
+  /* Badge */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-1 rounded-pill text-caption font-semibold;
+  }
+
+  /* Skeleton shimmer */
+  .skeleton {
+    @apply rounded-xl bg-surface-700 animate-shimmer;
+    background-image: linear-gradient(
+      90deg,
+      rgb(44 44 51) 0%,
+      rgb(63 63 72) 50%,
+      rgb(44 44 51) 100%
+    );
+    background-size: 800px 100%;
+  }
+
+  /* Progress bar */
+  .progress-track {
+    @apply w-full bg-surface-700 rounded-pill h-2 overflow-hidden;
+  }
+  .progress-fill {
+    @apply h-full rounded-pill transition-all duration-700 ease-out;
+  }
+
+  /* Section title */
+  .section-title {
+    @apply text-caption font-semibold text-slate-500 uppercase tracking-widest mb-3;
+  }
+}

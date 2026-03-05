@@ -1,0 +1,197 @@
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import Layout from '@/components/layout/Layout'
+import Card, { CardHeader } from '@/components/ui/Card'
+import Button from '@/components/ui/Button'
+import Input from '@/components/ui/Input'
+import Modal from '@/components/ui/Modal'
+import Badge from '@/components/ui/Badge'
+import Spinner from '@/components/ui/Spinner'
+import { useOrgStore } from '@/store/orgStore'
+import { useSwitchOrg, useCreateOrg, useInviteUser } from '@/hooks/useOrg'
+import { orgsApi } from '@/api/organizations'
+
+export default function Organizations() {
+  const navigate = useNavigate()
+  const { currentOrg, organizations, setOrganizations, isAdmin } = useOrgStore()
+  const { switchOrg, loading: switchLoading } = useSwitchOrg()
+  const { createOrg, loading: createLoading } = useCreateOrg()
+  const { invite, loading: inviteLoading } = useInviteUser()
+
+  const [loadingOrgs, setLoadingOrgs] = useState(false)
+  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [showInviteModal, setShowInviteModal] = useState(false)
+  const [orgName, setOrgName] = useState('')
+  const [inviteForm, setInviteForm] = useState({ username: '', role: 'member' })
+
+  useEffect(() => {
+    const fetchOrgs = async () => {
+      setLoadingOrgs(true)
+      try {
+        const { data } = await orgsApi.list()
+        setOrganizations(data.results ?? data)
+      } catch {} finally {
+        setLoadingOrgs(false)
+      }
+    }
+    fetchOrgs()
+  }, [setOrganizations])
+
+  const handleSwitch = async (org) => {
+    await switchOrg(org.id)
+    navigate('/')
+  }
+
+  const handleCreate = async () => {
+    if (!orgName.trim()) return
+    const org = await createOrg(orgName)
+    if (org) {
+      setOrgName('')
+      setShowCreateModal(false)
+    }
+  }
+
+  const handleInvite = async (e) => {
+    e.preventDefault()
+    await invite(inviteForm)
+    setInviteForm({ username: '', role: 'member' })
+    setShowInviteModal(false)
+  }
+
+  return (
+    <Layout title="Organizations">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-lg font-semibold text-slate-100">Your Organizations</h2>
+        <Button onClick={() => setShowCreateModal(true)} size="sm">+ Create</Button>
+      </div>
+
+      {loadingOrgs ? (
+        <div className="flex justify-center py-12"><Spinner /></div>
+      ) : organizations.length === 0 ? (
+        <Card>
+          <div className="flex flex-col items-center py-12 text-slate-500">
+            <span className="text-4xl mb-3">🏢</span>
+            <p className="text-sm">No organizations found</p>
+            <Button size="sm" className="mt-3" onClick={() => setShowCreateModal(true)}>
+              Create Organization
+            </Button>
+          </div>
+        </Card>
+      ) : (
+        <div className="space-y-3">
+          {organizations.map((org) => {
+            const isActive = currentOrg?.id === org.id
+            return (
+              <Card
+                key={org.id}
+                className={isActive ? 'border-primary-500/50 bg-primary-600/5' : ''}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg ${
+                      isActive ? 'bg-primary-600/30' : 'bg-surface-700'
+                    }`}>
+                      🏢
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold text-slate-100">{org.name}</p>
+                        {isActive && <Badge color="active">Active</Badge>}
+                      </div>
+                      <p className="text-xs text-slate-500">@{org.slug}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge color={currentOrg?.id === org.id ? currentOrg.role : 'member'}>
+                      {currentOrg?.id === org.id ? currentOrg.role : 'member'}
+                    </Badge>
+                    {!isActive && (
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => handleSwitch(org)}
+                        loading={switchLoading}
+                      >
+                        Switch
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </Card>
+            )
+          })}
+        </div>
+      )}
+
+      {/* Admin actions */}
+      {currentOrg && isAdmin() && (
+        <div className="mt-8">
+          <h3 className="text-sm font-medium text-slate-400 uppercase tracking-wide mb-3">
+            Manage: {currentOrg.name}
+          </h3>
+          <Card>
+            <CardHeader title="Team Management" subtitle="Invite members to your organization" />
+            <Button
+              size="sm"
+              onClick={() => setShowInviteModal(true)}
+            >
+              Invite Member
+            </Button>
+          </Card>
+        </div>
+      )}
+
+      {/* Create Modal */}
+      <Modal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} title="New Organization">
+        <div className="space-y-4">
+          <Input
+            label="Organization name"
+            value={orgName}
+            onChange={(e) => setOrgName(e.target.value)}
+            placeholder="My Gym"
+            autoFocus
+            onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
+          />
+          <div className="flex gap-3">
+            <Button variant="secondary" onClick={() => setShowCreateModal(false)} fullWidth>Cancel</Button>
+            <Button onClick={handleCreate} loading={createLoading} fullWidth>Create</Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Invite Modal */}
+      <Modal isOpen={showInviteModal} onClose={() => setShowInviteModal(false)} title="Invite Member">
+        <form onSubmit={handleInvite} className="space-y-4">
+          <Input
+            label="Username"
+            value={inviteForm.username}
+            onChange={(e) => setInviteForm((p) => ({ ...p, username: e.target.value }))}
+            placeholder="john_doe"
+            required
+            autoFocus
+          />
+          <div>
+            <label className="label">Role</label>
+            <select
+              className="input"
+              value={inviteForm.role}
+              onChange={(e) => setInviteForm((p) => ({ ...p, role: e.target.value }))}
+            >
+              <option value="member">Member</option>
+              <option value="trainer">Trainer</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <div className="flex gap-3">
+            <Button variant="secondary" type="button" onClick={() => setShowInviteModal(false)} fullWidth>
+              Cancel
+            </Button>
+            <Button type="submit" loading={inviteLoading} fullWidth>
+              Invite
+            </Button>
+          </div>
+        </form>
+      </Modal>
+    </Layout>
+  )
+}
