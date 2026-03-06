@@ -15,9 +15,11 @@ class User(AbstractUser):
 
 class Profile(BaseModel):
     class ActivityLevel(models.TextChoices):
-        LOW = "low", "Low"
-        MEDIUM = "medium", "Medium"
-        HIGH = "high", "High"
+        SEDENTARY = "sedentary", "Sedentary"
+        LIGHTLY_ACTIVE = "lightly_active", "Lightly Active"
+        MODERATELY_ACTIVE = "moderately_active", "Moderately Active"
+        VERY_ACTIVE = "very_active", "Very Active"
+        EXTRA_ACTIVE = "extra_active", "Extra Active"
 
     user = models.OneToOneField(
         User,
@@ -28,9 +30,9 @@ class Profile(BaseModel):
     weight = models.FloatField(null=True, blank=True, help_text="kg")
     age = models.PositiveIntegerField(null=True, blank=True)
     activity_level = models.CharField(
-        max_length=10,
+        max_length=20,
         choices=ActivityLevel.choices,
-        default=ActivityLevel.MEDIUM,
+        default=ActivityLevel.MODERATELY_ACTIVE,
     )
 
     def __str__(self):

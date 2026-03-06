@@ -20,10 +20,11 @@ class WorkoutSetSerializer(serializers.ModelSerializer):
 
 class WorkoutSessionSerializer(serializers.ModelSerializer):
     sets = WorkoutSetSerializer(many=True, read_only=True)
+    user_username = serializers.CharField(source="user.username", read_only=True)
 
     class Meta:
         model = WorkoutSession
-        fields = ["id", "program", "date", "is_active", "sets", "created_at"]
+        fields = ["id", "program", "date", "is_active", "sets", "created_at", "user_username"]
 
 
 class WorkoutProgramSerializer(serializers.ModelSerializer):

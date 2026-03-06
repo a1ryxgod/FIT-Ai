@@ -3,8 +3,18 @@ import { clsx } from 'clsx'
 import { useThemeStore } from '@/store/themeStore'
 import { useOrgStore } from '@/store/orgStore'
 
-const NAV = [
+const MEMBER_NAV = [
   { to: '/', label: 'Dashboard', exact: true },
+  { to: '/workouts', label: 'Workouts' },
+  { to: '/nutrition', label: 'Nutrition' },
+  { to: '/progress', label: 'Progress' },
+  { to: '/ai', label: 'AI Coach' },
+  { to: '/profile', label: 'Profile' },
+]
+
+const ADMIN_NAV = [
+  { to: '/', label: 'Dashboard', exact: true },
+  { to: '/members', label: 'Members' },
   { to: '/workouts', label: 'Workouts' },
   { to: '/nutrition', label: 'Nutrition' },
   { to: '/progress', label: 'Progress' },
@@ -15,7 +25,8 @@ const NAV = [
 
 export default function Sidebar() {
   const { theme } = useThemeStore()
-  const { currentOrg } = useOrgStore()
+  const { currentOrg, isAdmin } = useOrgStore()
+  const NAV = isAdmin() ? ADMIN_NAV : MEMBER_NAV
 
   return (
     <aside className="hidden md:flex flex-col w-60 min-h-screen sticky top-0" style={{ background: 'rgba(20,20,22,0.95)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderRight: '1px solid rgba(255,255,255,0.05)' }}>

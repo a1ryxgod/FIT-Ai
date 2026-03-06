@@ -1,7 +1,8 @@
 import { NavLink } from 'react-router-dom'
 import { clsx } from 'clsx'
+import { useOrgStore } from '@/store/orgStore'
 
-const NAV = [
+const MEMBER_NAV = [
   { to: '/', label: 'Home', exact: true },
   { to: '/workouts', label: 'Train' },
   { to: '/nutrition', label: 'Eat' },
@@ -10,7 +11,19 @@ const NAV = [
   { to: '/profile', label: 'Profile' },
 ]
 
+const ADMIN_NAV = [
+  { to: '/', label: 'Home', exact: true },
+  { to: '/workouts', label: 'Train' },
+  { to: '/members', label: 'Members' },
+  { to: '/ai', label: 'AI' },
+  { to: '/progress', label: 'Stats' },
+  { to: '/profile', label: 'Profile' },
+]
+
 export default function MobileNav() {
+  const { isAdmin } = useOrgStore()
+  const NAV = isAdmin() ? ADMIN_NAV : MEMBER_NAV
+
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 flex" style={{ background: 'rgba(20,20,22,0.92)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
       {NAV.map(({ to, label, exact }) => (

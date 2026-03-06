@@ -7,11 +7,16 @@ import Button from '@/components/ui/Button'
 import { useWorkoutHistory } from '@/hooks/useWorkouts'
 import { formatDate } from '@/utils/helpers'
 import { useNavigate } from 'react-router-dom'
+import { useOrgStore } from '@/store/orgStore'
 
 export default function WorkoutHistory() {
   const navigate = useNavigate()
+  const { isAdmin } = useOrgStore()
+  const admin = isAdmin()
   const [page, setPage] = useState(1)
-  const { data, isLoading } = useWorkoutHistory({ page, page_size: 10 })
+  const [showAll, setShowAll] = useState(false)
+  const params = { page, page_size: 10, ...(admin && showAll ? { all: 1 } : {}) }
+  const { data, isLoading } = useWorkoutHistory(params)
 
   const sessions = data?.results ?? []
   const totalPages = Math.ceil((data?.count ?? 0) / 10)
@@ -20,9 +25,24 @@ export default function WorkoutHistory() {
     <Layout title="Workout History">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-semibold text-slate-100">History</h2>
-        <Button onClick={() => navigate('/workouts')} variant="secondary" size="sm">
-          Back
-        </Button>
+        <div className="flex items-center gap-2">
+          {admin && (
+            <button
+              onClick={() => { setShowAll((v) => !v); setPage(1) }}
+              className={`text-[11px] font-semibold px-3 py-1.5 rounded-lg transition-colors ${
+                showAll
+                  ? 'text-brand-400 border border-brand-500/30'
+                  : 'text-slate-500 border border-transparent hover:text-slate-300'
+              }`}
+              style={showAll ? { background: 'rgba(var(--brand-500),0.1)' } : {}}
+            >
+              {showAll ? 'All Members' : 'My History'}
+            </button>
+          )}
+          <Button onClick={() => navigate('/workouts')} variant="secondary" size="sm">
+            Back
+          </Button>
+        </div>
       </div>
 
       {isLoading ? (
@@ -42,7 +62,11 @@ export default function WorkoutHistory() {
               <Card key={session.id}>
                 <CardHeader
                   title={formatDate(session.date)}
-                  subtitle={session.program ? `Program: ${session.program}` : 'Free session'}
+                  subtitle={
+                    showAll && session.user_username
+                      ? `${session.user_username} · ${session.program ? `Program: ${session.program}` : 'Free session'}`
+                      : session.program ? `Program: ${session.program}` : 'Free session'
+                  }
                   action={
                     <span className={`badge ${session.is_active ? 'bg-emerald-500/20 text-emerald-300' : 'bg-surface-700 text-slate-400'}`}>
                       {session.is_active ? 'Active' : 'Completed'}

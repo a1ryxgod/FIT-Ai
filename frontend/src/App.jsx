@@ -20,6 +20,7 @@ const Progress       = lazy(() => import('@/pages/Progress'))
 const Organizations  = lazy(() => import('@/pages/Organizations'))
 const Profile        = lazy(() => import('@/pages/Profile'))
 const AIChat         = lazy(() => import('@/pages/AI'))
+const Members        = lazy(() => import('@/pages/Members'))
 
 // ThemeBootstrap — loads org theme on mount when authenticated
 function ThemeBootstrap() {
@@ -63,6 +64,7 @@ export default function App() {
           <Route path="/nutrition"          element={<RequireOrg><Nutrition /></RequireOrg>} />
           <Route path="/progress"           element={<RequireOrg><Progress /></RequireOrg>} />
           <Route path="/ai"                 element={<RequireOrg><AIChat /></RequireOrg>} />
+          <Route path="/members"            element={<RequireOrg><Members /></RequireOrg>} />
 
           {/* 404 */}
           <Route path="*" element={<NotFound />} />

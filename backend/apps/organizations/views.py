@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import status
-from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import ListAPIView, ListCreateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -41,6 +41,18 @@ class InviteUserView(APIView):
         role = serializer.validated_data["role"]
         membership = services.invite_user(org, user, role)
         return Response(MembershipSerializer(membership).data, status=status.HTTP_200_OK)
+
+
+class OrgMembersView(ListAPIView):
+    permission_classes = [IsOrganizationMember, IsAdmin]
+    serializer_class = MembershipSerializer
+
+    def get_queryset(self):
+        org = get_object_or_404(Organization, pk=self.kwargs["pk"], is_active=True, is_deleted=False)
+        return Membership.objects.filter(
+            organization=org,
+            is_deleted=False,
+        ).select_related("user").order_by("role", "created_at")
 
 
 class SwitchOrganizationView(APIView):

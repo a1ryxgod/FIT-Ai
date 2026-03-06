@@ -5,4 +5,5 @@ export const orgsApi = {
   create: (data) => api.post('/api/orgs/', data),
   switch: (orgId) => api.post(`/api/orgs/${orgId}/switch/`),
   invite: (orgId, data) => api.post(`/api/orgs/${orgId}/invite/`, data),
+  members: (orgId) => api.get(`/api/orgs/${orgId}/members/`),
 }

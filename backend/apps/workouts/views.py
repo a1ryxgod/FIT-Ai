@@ -76,12 +76,14 @@ class WorkoutHistoryView(ListAPIView):
     serializer_class = WorkoutSessionSerializer
 
     def get_queryset(self):
-        return (
-            WorkoutSession.objects.filter(
-                organization=self.request.organization,
-                user=self.request.user,
-                is_deleted=False,
-            )
-            .prefetch_related("sets__exercise")
-            .order_by("-date")
-        )
+        is_admin = self.request.membership.role in ("owner", "admin")
+        show_all = self.request.query_params.get("all") == "1"
+
+        qs = WorkoutSession.objects.filter(
+            organization=self.request.organization,
+            is_deleted=False,
+        ).prefetch_related("sets__exercise")
+
+        if is_admin and show_all:
+            return qs.select_related("user").order_by("-date")
+        return qs.filter(user=self.request.user).order_by("-date")
