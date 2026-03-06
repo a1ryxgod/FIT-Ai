@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 import { useAuthStore } from '@/store/authStore'
 import { useOrgStore } from '@/store/orgStore'
@@ -80,6 +81,16 @@ export function useRegister() {
   }
 
   return { handleRegister, loading }
+}
+
+export function useProfileData() {
+  const accessToken = useAuthStore((s) => s.accessToken)
+  return useQuery({
+    queryKey: ['profile'],
+    queryFn: () => authApi.getProfile().then((r) => r.data),
+    enabled: !!accessToken,
+    staleTime: 60_000,
+  })
 }
 
 export function useProfile() {

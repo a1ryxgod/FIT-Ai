@@ -13,14 +13,25 @@ import Modal from '@/components/ui/Modal'
 import Spinner from '@/components/ui/Spinner'
 import EmptyState from '@/components/ui/EmptyState'
 import { useWeightHistory, useLogWeight } from '@/hooks/useProgress'
+import { usePersonalRecords } from '@/hooks/useWorkouts'
 import { formatDate, round1 } from '@/utils/helpers'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend, Filler)
+
+const MUSCLE_COLORS = {
+  chest: 'text-red-400',
+  back: 'text-blue-400',
+  legs: 'text-emerald-400',
+  shoulders: 'text-purple-400',
+  arms: 'text-amber-400',
+  core: 'text-cyan-400',
+}
 
 export default function Progress() {
   const [showModal, setShowModal] = useState(false)
   const [page, setPage] = useState(1)
   const { data, isLoading } = useWeightHistory({ page, page_size: 20 })
+  const { data: prs = [], isLoading: prsLoading } = usePersonalRecords()
 
   const logs = data?.results ?? []
   const totalPages = Math.ceil((data?.count ?? 0) / 20)
@@ -147,6 +158,41 @@ export default function Progress() {
           </Card>
         </>
       )}
+
+      {/* Personal Records */}
+      <div className="mt-6">
+        <h2 className="text-lg font-semibold text-slate-100 mb-4">Personal Records</h2>
+        {prsLoading ? (
+          <div className="flex justify-center py-8"><Spinner /></div>
+        ) : prs.length === 0 ? (
+          <Card>
+            <p className="text-sm text-slate-500 text-center py-4">No workout data yet. Complete a workout to see your records.</p>
+          </Card>
+        ) : (
+          <Card>
+            <div className="space-y-0">
+              {prs.map((pr, i) => (
+                <div key={pr.exercise_id} className="flex items-center gap-3 py-3 border-b border-surface-700 last:border-0">
+                  <div className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black text-slate-400 shrink-0"
+                    style={{ background: 'rgba(255,255,255,0.05)' }}>
+                    {i === 0 ? '🏆' : `${i + 1}`}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-slate-100 text-sm truncate">{pr.exercise_name}</p>
+                    <p className={`text-xs capitalize ${MUSCLE_COLORS[pr.muscle_group] ?? 'text-slate-500'}`}>
+                      {pr.muscle_group ?? 'Other'} · {formatDate(pr.date)}
+                    </p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="font-bold text-slate-100 text-sm">{pr.best_weight} kg × {pr.best_reps}</p>
+                    <p className="text-xs text-slate-500">1RM ≈ <span className="text-brand-400 font-semibold">{pr.estimated_1rm} kg</span></p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
+      </div>
 
       <LogWeightModal isOpen={showModal} onClose={() => setShowModal(false)} />
     </Layout>

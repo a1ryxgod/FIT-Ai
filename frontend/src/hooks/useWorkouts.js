@@ -82,6 +82,17 @@ export function useAddSet() {
   return { addWorkoutSet, loading }
 }
 
+export function usePersonalRecords() {
+  return useQuery({
+    queryKey: ['workout-prs'],
+    queryFn: async () => {
+      const { data } = await workoutsApi.getPRs()
+      return data
+    },
+    staleTime: 60_000,
+  })
+}
+
 export function useExercises() {
   return useQuery({
     queryKey: ['exercises'],

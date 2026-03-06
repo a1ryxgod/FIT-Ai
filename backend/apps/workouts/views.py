@@ -7,7 +7,7 @@ from rest_framework.viewsets import ModelViewSet
 from apps.core.permissions import IsOrganizationMember
 
 from . import services
-from .models import Exercise, WorkoutProgram, WorkoutSession
+from .models import Exercise, WorkoutProgram, WorkoutSession, WorkoutSet
 from .serializers import (
     AddSetSerializer,
     ExerciseSerializer,
@@ -69,6 +69,54 @@ class AddSetView(APIView):
             organization=request.organization,
         )
         return Response(WorkoutSetSerializer(workout_set).data, status=status.HTTP_201_CREATED)
+
+
+class PersonalRecordsView(APIView):
+    permission_classes = [IsOrganizationMember]
+
+    def get(self, request):
+        from django.db.models import Max
+
+        best_per_exercise = (
+            WorkoutSet.objects
+            .filter(
+                session__user=request.user,
+                session__organization=request.organization,
+                session__is_deleted=False,
+            )
+            .values("exercise__id", "exercise__name", "exercise__muscle_group")
+            .annotate(best_weight=Max("weight"))
+            .order_by("-best_weight")[:15]
+        )
+
+        result = []
+        for row in best_per_exercise:
+            best_set = (
+                WorkoutSet.objects
+                .filter(
+                    session__user=request.user,
+                    session__organization=request.organization,
+                    session__is_deleted=False,
+                    exercise__id=row["exercise__id"],
+                    weight=row["best_weight"],
+                )
+                .select_related("session")
+                .order_by("-session__date")
+                .first()
+            )
+            if best_set:
+                one_rm = round(best_set.weight * (1 + best_set.reps / 30), 1)
+                result.append({
+                    "exercise_id": str(row["exercise__id"]),
+                    "exercise_name": row["exercise__name"],
+                    "muscle_group": row["exercise__muscle_group"],
+                    "best_weight": best_set.weight,
+                    "best_reps": best_set.reps,
+                    "estimated_1rm": one_rm,
+                    "date": best_set.session.date,
+                })
+
+        return Response(result)
 
 
 class WorkoutHistoryView(ListAPIView):

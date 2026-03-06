@@ -35,6 +35,10 @@ export default function Profile() {
     weight: '',
     age: '',
     activity_level: 'moderately_active',
+    calorie_goal: 2000,
+    protein_goal: 150,
+    carbs_goal: 250,
+    fat_goal: 70,
   })
   const [showOrgModal, setShowOrgModal] = useState(false)
 
@@ -45,9 +49,35 @@ export default function Profile() {
         weight: data.weight ?? '',
         age: data.age ?? '',
         activity_level: data.activity_level ?? 'moderately_active',
+        calorie_goal: data.calorie_goal ?? 2000,
+        protein_goal: data.protein_goal ?? 150,
+        carbs_goal: data.carbs_goal ?? 250,
+        fat_goal: data.fat_goal ?? 70,
       })
     }).catch(() => {})
   }, [])
+
+  const ACTIVITY_MULTIPLIERS = {
+    sedentary: 1.2,
+    lightly_active: 1.375,
+    moderately_active: 1.55,
+    very_active: 1.725,
+    extra_active: 1.9,
+  }
+
+  const calcTDEE = () => {
+    const w = parseFloat(profileForm.weight)
+    const h = parseFloat(profileForm.height)
+    const a = parseFloat(profileForm.age)
+    if (!w || !h || !a) { toast.error('Fill in weight, height and age first'); return }
+    const bmr = 10 * w + 6.25 * h - 5 * a + 5
+    const tdee = Math.round(bmr * (ACTIVITY_MULTIPLIERS[profileForm.activity_level] ?? 1.55))
+    const protein = Math.round(w * 2)
+    const fat = Math.round((tdee * 0.25) / 9)
+    const carbs = Math.round((tdee - protein * 4 - fat * 9) / 4)
+    setProfileForm((p) => ({ ...p, calorie_goal: tdee, protein_goal: protein, fat_goal: fat, carbs_goal: carbs }))
+    toast.success('TDEE calculated')
+  }
 
   const onChange = (e) => setProfileForm((p) => ({ ...p, [e.target.name]: e.target.value }))
 
@@ -161,6 +191,60 @@ export default function Profile() {
             Save Profile
           </Button>
         </form>
+      </Card>
+
+      {/* Nutrition Goals */}
+      <Card className="mb-4">
+        <CardHeader
+          title="Nutrition Goals"
+          subtitle="Daily targets for tracking"
+          action={
+            <button
+              type="button"
+              onClick={calcTDEE}
+              className="text-[11px] font-semibold px-3 py-1.5 rounded-lg border border-brand-500/30 text-brand-400 transition-colors hover:bg-brand-500/10"
+            >
+              Auto-calculate
+            </button>
+          }
+        />
+        <div className="grid grid-cols-2 gap-3 mt-3">
+          <Input
+            label="Calories"
+            name="calorie_goal"
+            type="number"
+            value={profileForm.calorie_goal}
+            onChange={onChange}
+            hint="kcal"
+          />
+          <Input
+            label="Protein"
+            name="protein_goal"
+            type="number"
+            value={profileForm.protein_goal}
+            onChange={onChange}
+            hint="g"
+          />
+          <Input
+            label="Carbs"
+            name="carbs_goal"
+            type="number"
+            value={profileForm.carbs_goal}
+            onChange={onChange}
+            hint="g"
+          />
+          <Input
+            label="Fat"
+            name="fat_goal"
+            type="number"
+            value={profileForm.fat_goal}
+            onChange={onChange}
+            hint="g"
+          />
+        </div>
+        <Button type="button" onClick={handleSave} loading={savingProfile} fullWidth className="mt-4">
+          Save Goals
+        </Button>
       </Card>
 
       {/* Organization section */}

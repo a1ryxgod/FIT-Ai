@@ -15,4 +15,5 @@ export const workoutsApi = {
   startSession: (data = {}) => api.post('/api/workouts/start/', data),
   addSet: (data) => api.post('/api/workouts/add-set/', data),
   getHistory: (params) => api.get('/api/workouts/history/', { params }),
+  getPRs: () => api.get('/api/workouts/prs/'),
 }

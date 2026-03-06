@@ -6,9 +6,8 @@ import Input from '@/components/ui/Input'
 import Modal from '@/components/ui/Modal'
 import { SkeletonStatRow, SkeletonList } from '@/components/ui/Skeleton'
 import { useTodaySummary, useFoodProducts, useLogFood } from '@/hooks/useNutrition'
+import { useProfileData } from '@/hooks/useAuth'
 import { round1 } from '@/utils/helpers'
-
-const MACRO_GOALS = { calories: 2000, protein: 150, carbs: 250, fats: 70 }
 
 // Meal type grouping matching MyFitnessPal pattern
 const MEAL_TYPES = [
@@ -21,6 +20,14 @@ const MEAL_TYPES = [
 export default function Nutrition() {
   const [showLogModal, setShowLogModal] = useState(false)
   const [activeMeal, setActiveMeal] = useState('breakfast')
+
+  const { data: profile } = useProfileData()
+  const MACRO_GOALS = {
+    calories: profile?.calorie_goal ?? 2000,
+    protein:  profile?.protein_goal ?? 150,
+    carbs:    profile?.carbs_goal   ?? 250,
+    fats:     profile?.fat_goal     ?? 70,
+  }
 
   const { data: todayData, isLoading: loadingToday } = useTodaySummary()
   const totals = todayData?.totals ?? {}

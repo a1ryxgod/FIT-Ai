@@ -12,7 +12,8 @@ import { SkeletonStatRow, SkeletonCard } from '@/components/ui/Skeleton'
 import OwnerDashboard from '@/components/dashboard/OwnerDashboard'
 import { useTodaySummary } from '@/hooks/useNutrition'
 import { useWeightHistory } from '@/hooks/useProgress'
-import { useWorkoutHistory } from '@/hooks/useWorkouts'
+import { useWorkoutHistory, usePersonalRecords } from '@/hooks/useWorkouts'
+import { useProfileData } from '@/hooks/useAuth'
 import { useOrgStore } from '@/store/orgStore'
 import { useAuthStore } from '@/store/authStore'
 import { round1, macroPercent, formatDate } from '@/utils/helpers'
@@ -26,13 +27,27 @@ const TOOLTIP_STYLE = { backgroundColor: '#1c1c22', borderColor: '#3f3f48', bord
 export default function Dashboard() {
   const user     = useAuthStore((s) => s.user)
   const { currentOrg, isOwner, isAdmin } = useOrgStore()
+  const { data: profile } = useProfileData()
   const { data: todayData,   isLoading: loadingToday    } = useTodaySummary()
   const { data: weightData,  isLoading: loadingWeight   } = useWeightHistory({ page_size: 14 })
-  const { data: workoutData, isLoading: loadingWorkouts } = useWorkoutHistory({ page_size: 5 })
+  const { data: workoutData, isLoading: loadingWorkouts } = useWorkoutHistory({ page_size: 20 })
+  const { data: prs = [] } = usePersonalRecords()
 
   const totals     = todayData?.totals ?? {}
   const weightLogs = weightData?.results ?? []
   const sessions   = workoutData?.results ?? []
+
+  // Weekly workout count
+  const weekStart = new Date()
+  weekStart.setDate(weekStart.getDate() - weekStart.getDay())
+  weekStart.setHours(0, 0, 0, 0)
+  const weeklyCount = sessions.filter((s) => new Date(s.date) >= weekStart).length
+  const WEEKLY_GOAL = 5
+
+  // Latest PR
+  const latestPR = prs.length > 0
+    ? [...prs].sort((a, b) => new Date(b.date) - new Date(a.date))[0]
+    : null
 
   const weightChartData = {
     labels: [...weightLogs].reverse().map((w) => formatDate(w.date)),
@@ -56,7 +71,7 @@ export default function Dashboard() {
     }],
   }
 
-  const calorieGoal = 2300
+  const calorieGoal = profile?.calorie_goal ?? 2000
   const caloriePct  = Math.min(100, Math.round(((totals.calories ?? 0) / calorieGoal) * 100))
 
   return (
@@ -187,6 +202,39 @@ export default function Dashboard() {
             </div>
             <Link to="/workouts"><Button>Start</Button></Link>
           </div>
+        </Card>
+      </div>
+
+      {/* Weekly Activity + Latest PR */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <Card>
+          <p className="text-caption text-slate-500 mb-1">This Week</p>
+          <div className="flex items-end gap-1 mb-2">
+            <span className="text-h2 font-bold text-white">{weeklyCount}</span>
+            <span className="text-small text-slate-500 mb-0.5">/ {WEEKLY_GOAL} workouts</span>
+          </div>
+          <div className="flex gap-1">
+            {Array.from({ length: WEEKLY_GOAL }).map((_, i) => (
+              <div
+                key={i}
+                className="flex-1 h-2 rounded-full"
+                style={{ background: i < weeklyCount ? 'rgb(var(--brand-500))' : 'rgba(255,255,255,0.07)' }}
+              />
+            ))}
+          </div>
+        </Card>
+
+        <Card>
+          <p className="text-caption text-slate-500 mb-1">Latest PR</p>
+          {latestPR ? (
+            <>
+              <p className="font-bold text-white text-sm truncate">{latestPR.exercise_name}</p>
+              <p className="text-small text-slate-400">{latestPR.best_weight} kg × {latestPR.best_reps} reps</p>
+              <p className="text-caption text-brand-400 mt-0.5">1RM ≈ {latestPR.estimated_1rm} kg</p>
+            </>
+          ) : (
+            <p className="text-small text-slate-500 mt-1">No records yet</p>
+          )}
         </Card>
       </div>
 

@@ -34,6 +34,10 @@ class Profile(BaseModel):
         choices=ActivityLevel.choices,
         default=ActivityLevel.MODERATELY_ACTIVE,
     )
+    calorie_goal = models.IntegerField(default=2000)
+    protein_goal = models.IntegerField(default=150)
+    carbs_goal   = models.IntegerField(default=250)
+    fat_goal     = models.IntegerField(default=70)
 
     def __str__(self):
         return f"Profile({self.user.username})"
