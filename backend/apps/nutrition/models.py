@@ -10,7 +10,8 @@ from apps.organizations.models import Organization
 
 class FoodProduct(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=200, unique=True)
+    name = models.CharField(max_length=200, unique=True, db_index=True)
+    brand = models.CharField(max_length=200, blank=True, default="")
     calories = models.FloatField(help_text="kcal per 100g")
     protein = models.FloatField(help_text="g per 100g")
     fats = models.FloatField(help_text="g per 100g")
@@ -34,9 +35,13 @@ class FoodLog(BaseModel):
     product = models.ForeignKey(FoodProduct, on_delete=models.CASCADE, related_name="logs")
     grams = models.FloatField(help_text="Amount in grams")
     date = models.DateField(default=date.today, db_index=True)
+    calories = models.FloatField(default=0, help_text="Calculated kcal for this log entry")
+    protein = models.FloatField(default=0, help_text="Calculated protein (g) for this log entry")
+    carbs = models.FloatField(default=0, help_text="Calculated carbs (g) for this log entry")
+    fat = models.FloatField(default=0, help_text="Calculated fat (g) for this log entry")
 
     class Meta:
-        ordering = ["-date"]
+        ordering = ["-date", "-created_at"]
         indexes = [models.Index(fields=["organization", "user", "date"])]
 
     def __str__(self):

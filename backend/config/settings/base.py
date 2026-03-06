@@ -36,6 +36,7 @@ LOCAL_APPS = [
     "apps.workouts",
     "apps.nutrition",
     "apps.progress",
+    "apps.ai",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -155,6 +156,10 @@ SPECTACULAR_SETTINGS = {
         "persistAuthorization": True,
     },
 }
+
+# OpenAI
+OPENAI_API_KEY = config("OPENAI_API_KEY", default="")
+OPENAI_MODEL = config("OPENAI_MODEL", default="gpt-4o-mini")
 
 LOGGING = {
     "version": 1,

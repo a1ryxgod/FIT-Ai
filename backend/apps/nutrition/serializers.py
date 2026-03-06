@@ -6,7 +6,7 @@ from .models import FoodLog, FoodProduct
 class FoodProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = FoodProduct
-        fields = ["id", "name", "calories", "protein", "fats", "carbs"]
+        fields = ["id", "name", "brand", "calories", "protein", "fats", "carbs"]
 
 
 class FoodLogSerializer(serializers.ModelSerializer):
@@ -15,8 +15,8 @@ class FoodLogSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FoodLog
-        fields = ["id", "product", "product_id", "grams", "date", "created_at"]
-        read_only_fields = ["id", "created_at"]
+        fields = ["id", "product", "product_id", "grams", "date", "calories", "protein", "carbs", "fat", "created_at"]
+        read_only_fields = ["id", "calories", "protein", "carbs", "fat", "created_at"]
 
 
 class LogFoodSerializer(serializers.Serializer):

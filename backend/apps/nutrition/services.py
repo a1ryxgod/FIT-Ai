@@ -7,12 +7,17 @@ from .models import FoodLog, FoodProduct
 
 def log_food(user, organization, product_id, grams, log_date=None):
     product = get_object_or_404(FoodProduct, pk=product_id)
+    ratio = grams / 100.0
     return FoodLog.objects.create(
         user=user,
         organization=organization,
         product=product,
         grams=grams,
         date=log_date or date_type.today(),
+        calories=round(product.calories * ratio, 2),
+        protein=round(product.protein * ratio, 2),
+        carbs=round(product.carbs * ratio, 2),
+        fat=round(product.fats * ratio, 2),
     )
 
 
@@ -27,10 +32,9 @@ def get_today_summary(user, organization, log_date=None):
 
     totals = {"calories": 0.0, "protein": 0.0, "fats": 0.0, "carbs": 0.0}
     for log in logs:
-        ratio = log.grams / 100.0
-        totals["calories"] += log.product.calories * ratio
-        totals["protein"] += log.product.protein * ratio
-        totals["fats"] += log.product.fats * ratio
-        totals["carbs"] += log.product.carbs * ratio
+        totals["calories"] += log.calories
+        totals["protein"] += log.protein
+        totals["fats"] += log.fat
+        totals["carbs"] += log.carbs
 
     return logs, totals

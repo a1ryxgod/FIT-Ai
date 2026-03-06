@@ -5,7 +5,8 @@ const NAV = [
   { to: '/', label: 'Home', exact: true },
   { to: '/workouts', label: 'Train' },
   { to: '/nutrition', label: 'Eat' },
-  { to: '/progress', label: 'Progress' },
+  { to: '/ai', label: 'AI' },
+  { to: '/progress', label: 'Stats' },
   { to: '/profile', label: 'Profile' },
 ]
 

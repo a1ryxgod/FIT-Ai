@@ -10,4 +10,5 @@ urlpatterns = [
     path("", include(router.urls)),
     path("food/log/", views.FoodLogCreateView.as_view(), name="food-log"),
     path("food/today/", views.TodayFoodView.as_view(), name="food-today"),
+    path("food/history/", views.FoodHistoryView.as_view(), name="food-history"),
 ]

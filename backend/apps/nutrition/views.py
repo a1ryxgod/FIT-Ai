@@ -1,12 +1,15 @@
 from rest_framework import status
+from rest_framework.filters import SearchFilter
+from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
+from apps.core.pagination import StandardPagination
 from apps.core.permissions import IsOrganizationMember
 
 from . import services
-from .models import FoodProduct
+from .models import FoodLog, FoodProduct
 from .serializers import (
     FoodLogSerializer,
     FoodProductSerializer,
@@ -18,8 +21,22 @@ from .serializers import (
 class FoodProductViewSet(ReadOnlyModelViewSet):
     permission_classes = [IsOrganizationMember]
     serializer_class = FoodProductSerializer
-    search_fields = ["name"]
+    filter_backends = [SearchFilter]
+    search_fields = ["name", "brand"]
     queryset = FoodProduct.objects.all()
+
+
+class FoodHistoryView(ListAPIView):
+    permission_classes = [IsOrganizationMember]
+    serializer_class = FoodLogSerializer
+    pagination_class = StandardPagination
+
+    def get_queryset(self):
+        return FoodLog.objects.filter(
+            organization=self.request.organization,
+            user=self.request.user,
+            is_deleted=False,
+        ).select_related("product").order_by("-date", "-created_at")
 
 
 class FoodLogCreateView(APIView):

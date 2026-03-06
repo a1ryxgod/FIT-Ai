@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 import { nutritionApi } from '@/api/nutrition'
@@ -32,8 +31,20 @@ export function useLogFood() {
     mutationFn: (data) => nutritionApi.logFood(data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['today-summary'] })
+      qc.invalidateQueries({ queryKey: ['food-history'] })
       toast.success('Food logged')
     },
     onError: (err) => toast.error(err.response?.data?.error ?? 'Failed to log food'),
+  })
+}
+
+export function useFoodHistory(params = {}) {
+  return useQuery({
+    queryKey: ['food-history', params],
+    queryFn: async () => {
+      const { data } = await nutritionApi.foodHistory(params)
+      return data
+    },
+    staleTime: 1000 * 60 * 2,
   })
 }
