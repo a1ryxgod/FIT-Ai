@@ -81,16 +81,15 @@ export default function Progress() {
       {/* Stats Row */}
       {logs.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-          <StatCard label="Current" value={latest ?? '—'} unit="kg" color="primary" icon="⚖️" />
+          <StatCard label="Current" value={latest ?? '—'} unit="kg" color="brand" />
           <StatCard
             label="Change"
             value={diff != null ? (diff > 0 ? `+${diff}` : diff) : '—'}
             unit={diff != null ? 'kg' : ''}
-            color={diff == null ? 'primary' : diff <= 0 ? 'green' : 'red'}
-            icon={diff != null && diff > 0 ? '📈' : '📉'}
+            color={diff == null ? 'brand' : diff <= 0 ? 'green' : 'red'}
           />
-          <StatCard label="Min" value={min ?? '—'} unit={min != null ? 'kg' : ''} color="green" icon="🔽" />
-          <StatCard label="Max" value={max ?? '—'} unit={max != null ? 'kg' : ''} color="red" icon="🔼" />
+          <StatCard label="Min" value={min ?? '—'} unit={min != null ? 'kg' : ''} color="green" />
+          <StatCard label="Max" value={max ?? '—'} unit={max != null ? 'kg' : ''} color="red" />
         </div>
       )}
 
@@ -99,7 +98,6 @@ export default function Progress() {
         <div className="flex justify-center py-12"><Spinner /></div>
       ) : logs.length === 0 ? (
         <EmptyState
-          icon="⚖️"
           title="No weight logs yet"
           description="Start tracking your weight to see progress over time"
           action="Log Weight"

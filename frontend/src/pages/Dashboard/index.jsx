@@ -64,7 +64,7 @@ export default function Dashboard() {
       {/* Greeting */}
       <div className="mb-6">
         <p className="text-caption text-slate-500 uppercase tracking-wide">{getGreeting()}</p>
-        <h2 className="text-h2 mt-0.5">{user?.username ?? 'Athlete'} 👋</h2>
+        <h2 className="text-h2 mt-0.5">{user?.username ?? 'Athlete'}</h2>
         {currentOrg && <p className="text-caption text-slate-500 mt-1">{currentOrg.name}</p>}
       </div>
 
@@ -124,7 +124,6 @@ export default function Dashboard() {
             <div className="h-40 skeleton rounded-xl" />
           ) : weightLogs.length === 0 ? (
             <div className="flex flex-col items-center py-8 text-slate-600">
-              <span className="text-3xl mb-2">⚖️</span>
               <p className="text-caption">No weight entries</p>
             </div>
           ) : (
@@ -144,7 +143,6 @@ export default function Dashboard() {
             <div className="h-40 skeleton rounded-xl" />
           ) : (totals.calories ?? 0) === 0 ? (
             <div className="flex flex-col items-center py-8 text-slate-600">
-              <span className="text-3xl mb-2">🍽️</span>
               <p className="text-caption">No food logged yet</p>
             </div>
           ) : (
@@ -202,7 +200,6 @@ export default function Dashboard() {
           <div className="space-y-2"><SkeletonCard /><SkeletonCard /></div>
         ) : sessions.length === 0 ? (
           <Card className="text-center py-8">
-            <p className="text-3xl mb-2">💪</p>
             <p className="text-small text-slate-500">No workouts yet</p>
           </Card>
         ) : (

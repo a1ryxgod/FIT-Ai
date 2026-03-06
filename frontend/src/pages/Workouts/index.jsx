@@ -59,8 +59,8 @@ export default function Workouts() {
             <p className="text-white font-bold text-h2 mt-0.5">Quick Start</p>
             <p className="text-white/60 text-small mt-1">Start without a program</p>
           </div>
-          <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center text-3xl">
-            ⚡
+          <div className="w-14 h-14 bg-white/15 rounded-2xl flex items-center justify-center">
+            <span className="text-white font-black text-xl tracking-tight">GO</span>
           </div>
         </div>
         {startLoading && (
@@ -76,7 +76,6 @@ export default function Workouts() {
         <SkeletonList count={3} />
       ) : programs.length === 0 ? (
         <EmptyState
-          icon="📋"
           title="No programs yet"
           description="Create a workout program to structure your training"
           action="Create Program"
@@ -119,8 +118,8 @@ function ProgramCard({ program, onStart, loading }) {
   return (
     <Card className="flex items-center justify-between gap-3">
       <div className="flex items-center gap-3 min-w-0">
-        <div className="w-11 h-11 bg-brand-500/15 border border-brand-500/20 rounded-xl flex items-center justify-center text-xl flex-shrink-0">
-          💪
+        <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 text-[11px] font-black text-brand-400 tracking-tight" style={{ background: 'rgba(var(--brand-500),0.1)', border: '1px solid rgba(var(--brand-500),0.15)' }}>
+          {program.name?.[0]?.toUpperCase()}
         </div>
         <div className="min-w-0">
           <p className="font-semibold text-slate-100 text-small truncate">{program.name}</p>

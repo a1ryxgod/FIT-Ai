@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-// Convert hex "#FF3B30" → "255 59 48" for CSS rgb() vars
+// Convert hex "#6C5CE7" → "108 92 231" for CSS rgb() vars
 function hexToRgbStr(hex) {
   const r = parseInt(hex.slice(1, 3), 16)
   const g = parseInt(hex.slice(3, 5), 16)
@@ -36,8 +36,8 @@ function applyBrandColor(hex) {
 
 const DEFAULT_THEME = {
   app_name: 'FitTrack',
-  primary_color: '#FF3B30',
-  secondary_color: '#111116',
+  primary_color: '#6C5CE7',
+  secondary_color: '#0F0F11',
   logo: null,
 }
 

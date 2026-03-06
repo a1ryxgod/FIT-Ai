@@ -12,10 +12,10 @@ const MACRO_GOALS = { calories: 2000, protein: 150, carbs: 250, fats: 70 }
 
 // Meal type grouping matching MyFitnessPal pattern
 const MEAL_TYPES = [
-  { key: 'breakfast', label: 'Breakfast', icon: '🌅' },
-  { key: 'lunch',     label: 'Lunch',     icon: '☀️'  },
-  { key: 'dinner',    label: 'Dinner',    icon: '🌙' },
-  { key: 'snack',     label: 'Snacks',    icon: '🍎'  },
+  { key: 'breakfast', label: 'Breakfast', abbr: 'AM' },
+  { key: 'lunch',     label: 'Lunch',     abbr: '12' },
+  { key: 'dinner',    label: 'Dinner',    abbr: 'PM' },
+  { key: 'snack',     label: 'Snacks',    abbr: '+' },
 ]
 
 export default function Nutrition() {
@@ -101,7 +101,7 @@ export default function Nutrition() {
           <SkeletonList count={2} />
         ) : (
           <div className="space-y-3">
-            {MEAL_TYPES.map(({ key, label, icon }) => {
+            {MEAL_TYPES.map(({ key, label }) => {
               const mealLogs = byMeal[key] ?? []
               const mealCals = mealLogs.reduce((sum, l) => {
                 const factor = (l.grams ?? 100) / 100
@@ -112,7 +112,6 @@ export default function Nutrition() {
                 <Card key={key}>
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <span className="text-xl">{icon}</span>
                       <div>
                         <p className="font-semibold text-slate-100 text-small">{label}</p>
                         {mealLogs.length > 0 && (
@@ -196,18 +195,19 @@ function LogFoodModal({ isOpen, onClose, defaultMeal = 'lunch' }) {
       <div className="space-y-4">
         {/* Meal selector */}
         <div className="flex gap-2">
-          {MEAL_TYPES.map(({ key, icon, label }) => (
+          {MEAL_TYPES.map(({ key, abbr, label }) => (
             <button
               key={key}
               type="button"
               onClick={() => setMealType(key)}
-              className={`flex-1 flex flex-col items-center py-2 rounded-xl text-[10px] font-medium transition-all ${
+              className={`flex-1 flex flex-col items-center py-2.5 rounded-xl text-[10px] font-semibold tracking-wide transition-all ${
                 mealType === key
-                  ? 'bg-brand-500/20 text-brand-400 border border-brand-500/30'
-                  : 'bg-surface-750 text-slate-500 hover:text-slate-300'
+                  ? 'text-brand-400 border border-brand-500/30'
+                  : 'text-slate-500 hover:text-slate-300'
               }`}
+            style={mealType === key ? { background: 'rgba(var(--brand-500),0.12)' } : { background: 'rgba(255,255,255,0.04)' }}
             >
-              <span className="text-lg mb-0.5">{icon}</span>
+              <span className="text-[13px] font-black mb-0.5">{abbr}</span>
               {label}
             </button>
           ))}

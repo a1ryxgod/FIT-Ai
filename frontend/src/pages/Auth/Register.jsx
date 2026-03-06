@@ -49,15 +49,22 @@ export default function Register() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-surface-900 px-4 py-8">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center px-4 py-8 relative overflow-hidden" style={{ background: '#0F0F11' }}>
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full opacity-20"
+          style={{ background: 'radial-gradient(circle, rgb(var(--brand-500)) 0%, transparent 70%)' }} />
+      </div>
+      <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-8">
-          <div className="text-5xl mb-3">🏋️</div>
-          <h1 className="text-2xl font-bold text-white">Create Account</h1>
-          <p className="text-slate-400 mt-1">Start your fitness journey</p>
+          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center text-lg font-black text-white tracking-tight"
+            style={{ background: 'rgb(var(--brand-500))' }}>
+            FT
+          </div>
+          <h1 className="text-h1 text-white">Create Account</h1>
+          <p className="text-slate-500 mt-1 text-small">Start your fitness journey</p>
         </div>
 
-        <div className="card border border-surface-600">
+        <div className="card p-6">
           <form onSubmit={onSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <Input
@@ -116,9 +123,9 @@ export default function Register() {
             </Button>
           </form>
 
-          <p className="text-center text-sm text-slate-400 mt-4">
+          <p className="text-center text-small text-slate-500 mt-5">
             Already have an account?{' '}
-            <Link to="/login" className="text-primary-400 hover:text-primary-300 font-medium">
+            <Link to="/login" className="text-brand-400 hover:text-brand-300 font-medium">
               Sign in
             </Link>
           </p>

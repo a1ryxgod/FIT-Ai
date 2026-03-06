@@ -175,7 +175,9 @@ export default function Profile() {
         />
         {currentOrg ? (
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-brand-500/20 rounded-xl flex items-center justify-center text-lg">🏢</div>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-small font-black text-brand-400" style={{ background: 'rgba(var(--brand-500),0.12)' }}>
+              {currentOrg.name?.[0]?.toUpperCase()}
+            </div>
             <div>
               <p className="font-semibold text-slate-100">{currentOrg.name}</p>
               <p className="text-caption text-slate-500">@{currentOrg.slug} · <span className="capitalize">{currentOrg.role}</span></p>
@@ -188,8 +190,10 @@ export default function Profile() {
 
       {/* App info */}
       <Card className="mb-4">
-        <div className="flex items-center gap-3 mb-3">
-          <span className="text-2xl">🏋️</span>
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[11px] font-black text-white" style={{ background: 'rgb(var(--brand-500))' }}>
+            FT
+          </div>
           <div>
             <p className="font-semibold text-slate-100">{theme.app_name}</p>
             <p className="text-caption text-slate-500">v1.0.0</p>
@@ -200,9 +204,8 @@ export default function Profile() {
       {/* Logout */}
       <button
         onClick={handleLogout}
-        className="btn-danger w-full flex items-center justify-center gap-2"
+        className="btn-danger w-full"
       >
-        <span>🚪</span>
         Sign Out
       </button>
 
@@ -225,10 +228,10 @@ export default function Profile() {
                       : 'hover:bg-surface-700 border border-transparent'
                   }`}
                 >
-                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-base ${
-                    isActive ? 'bg-brand-500/30' : 'bg-surface-700'
-                  }`}>
-                    🏢
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-small font-black ${
+                    isActive ? 'text-brand-400' : 'text-slate-400'
+                  }`} style={{ background: isActive ? 'rgba(var(--brand-500),0.2)' : 'rgba(255,255,255,0.05)' }}>
+                    {org.name?.[0]?.toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-slate-100 text-small">{org.name}</p>

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import Card, { CardHeader } from '@/components/ui/Card'
-import { SkeletonStatRow, SkeletonCard } from '@/components/ui/Skeleton'
+import { SkeletonStatRow } from '@/components/ui/Skeleton'
 import api from '@/api/axios'
 
 function useOrgStats() {
@@ -11,7 +11,6 @@ function useOrgStats() {
         const { data } = await api.get('/api/orgs/current/stats/')
         return data
       } catch {
-        // Graceful fallback if endpoint not yet implemented
         return { members_count: 0, active_sessions_today: 0, workouts_this_week: 0 }
       }
     },
@@ -23,10 +22,10 @@ export default function OwnerDashboard() {
   const { data: stats, isLoading } = useOrgStats()
 
   const items = [
-    { label: 'Members', value: stats?.members_count ?? 0, icon: '👥', color: 'text-brand-400' },
-    { label: 'Active Today', value: stats?.active_sessions_today ?? 0, icon: '🔥', color: 'text-orange-400' },
-    { label: 'Workouts / Week', value: stats?.workouts_this_week ?? 0, icon: '💪', color: 'text-emerald-400' },
-    { label: 'Food Logs Today', value: stats?.food_logs_today ?? 0, icon: '🍽️', color: 'text-blue-400' },
+    { label: 'Members', value: stats?.members_count ?? 0, color: 'text-brand-400' },
+    { label: 'Active Today', value: stats?.active_sessions_today ?? 0, color: 'text-orange-400' },
+    { label: 'Workouts / Week', value: stats?.workouts_this_week ?? 0, color: 'text-emerald-400' },
+    { label: 'Food Logs Today', value: stats?.food_logs_today ?? 0, color: 'text-blue-400' },
   ]
 
   return (
@@ -36,17 +35,15 @@ export default function OwnerDashboard() {
         <SkeletonStatRow />
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {items.map(({ label, value, icon, color }) => (
+          {items.map(({ label, value, color }) => (
             <Card key={label} className="text-center py-3">
-              <div className="text-2xl mb-1">{icon}</div>
               <p className={`text-h2 font-bold ${color}`}>{value}</p>
-              <p className="text-caption text-slate-500 mt-0.5">{label}</p>
+              <p className="text-caption text-slate-500 mt-1">{label}</p>
             </Card>
           ))}
         </div>
       )}
 
-      {/* Member activity table */}
       {stats?.recent_activity?.length > 0 && (
         <Card className="mt-3">
           <CardHeader title="Recent Activity" />

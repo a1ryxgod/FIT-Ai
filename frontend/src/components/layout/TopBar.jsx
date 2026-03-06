@@ -8,7 +8,7 @@ export default function TopBar({ title }) {
   const navigate = useNavigate()
 
   return (
-    <header className="flex items-center justify-between px-4 md:px-6 py-3.5 bg-surface-900/90 backdrop-blur-md border-b border-surface-700/60 sticky top-0 z-30">
+    <header className="flex items-center justify-between px-4 md:px-6 py-3.5 sticky top-0 z-30" style={{ background: 'rgba(20,20,22,0.9)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
       <div>
         <h1 className="text-small font-semibold text-slate-100 md:text-base">{title}</h1>
         {currentOrg && (

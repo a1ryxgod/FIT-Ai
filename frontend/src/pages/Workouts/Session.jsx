@@ -25,7 +25,6 @@ export default function Session() {
     return (
       <Layout title="Session">
         <div className="flex flex-col items-center justify-center py-24 text-center">
-          <p className="text-4xl mb-4">💪</p>
           <p className="text-slate-400 mb-4">No active session</p>
           <Button onClick={() => navigate('/workouts')}>Back to Workouts</Button>
         </div>
@@ -130,7 +129,9 @@ export default function Session() {
       {selected && (
         <Card className="mb-4">
           <div className="flex items-center gap-2 mb-4">
-            <div className="w-9 h-9 bg-brand-500/15 rounded-xl flex items-center justify-center text-base">💪</div>
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center text-[10px] font-black text-brand-400" style={{ background: 'rgba(var(--brand-500),0.12)' }}>
+              {selected.name?.[0]?.toUpperCase()}
+            </div>
             <div>
               <p className="text-small font-semibold text-slate-100">{selected.name}</p>
               <p className="text-caption text-slate-500">{selected.muscle_group}</p>
