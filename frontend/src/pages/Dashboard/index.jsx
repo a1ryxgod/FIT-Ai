@@ -63,7 +63,7 @@ export default function Dashboard() {
 
   const macros = macroPercent(totals)
   const macroChart = {
-    labels: ['Protein', 'Carbs', 'Fats'],
+    labels: ['Білки', 'Вуглеводи', 'Жири'],
     datasets: [{
       data: [macros.protein, macros.carbs, macros.fats],
       backgroundColor: ['rgb(var(--brand-500))', '#10b981', '#f59e0b'],
@@ -75,11 +75,11 @@ export default function Dashboard() {
   const caloriePct  = Math.min(100, Math.round(((totals.calories ?? 0) / calorieGoal) * 100))
 
   return (
-    <Layout title="Dashboard">
+    <Layout title="Головна">
       {/* Greeting */}
       <div className="mb-6">
         <p className="text-caption text-slate-500 uppercase tracking-wide">{getGreeting()}</p>
-        <h2 className="text-h2 mt-0.5">{user?.username ?? 'Athlete'}</h2>
+        <h2 className="text-h2 mt-0.5">{user?.username ?? 'Атлет'}</h2>
         {currentOrg && <p className="text-caption text-slate-500 mt-1">{currentOrg.name}</p>}
       </div>
 
@@ -88,19 +88,19 @@ export default function Dashboard() {
 
       {/* Today's nutrition */}
       <div className="mb-6">
-        <p className="section-title">Today's Nutrition</p>
+        <p className="section-title">Харчування сьогодні</p>
         {loadingToday ? <SkeletonStatRow /> : (
           <Card className="mb-3">
             <div className="flex items-center justify-between mb-3">
               <div>
-                <p className="text-caption text-slate-500">Calories</p>
+                <p className="text-caption text-slate-500">Калорії</p>
                 <p className="text-h2 font-bold text-white">
                   {round1(totals.calories ?? 0)}
-                  <span className="text-small text-slate-500 font-normal ml-1">/ {calorieGoal} kcal</span>
+                  <span className="text-small text-slate-500 font-normal ml-1">/ {calorieGoal} ккал</span>
                 </p>
               </div>
               <Link to="/nutrition">
-                <Button size="sm" variant="secondary">Log Food</Button>
+                <Button size="sm" variant="secondary">Додати їжу</Button>
               </Link>
             </div>
             <div className="progress-track">
@@ -111,9 +111,9 @@ export default function Dashboard() {
             </div>
             <div className="grid grid-cols-3 gap-3 mt-3">
               {[
-                { label: 'Protein', value: round1(totals.protein ?? 0), unit: 'g', color: 'text-emerald-400' },
-                { label: 'Carbs',   value: round1(totals.carbs   ?? 0), unit: 'g', color: 'text-amber-400'   },
-                { label: 'Fats',    value: round1(totals.fats    ?? 0), unit: 'g', color: 'text-blue-400'    },
+                { label: 'Білки',     value: round1(totals.protein ?? 0), unit: 'г', color: 'text-emerald-400' },
+                { label: 'Вуглеводи', value: round1(totals.carbs   ?? 0), unit: 'г', color: 'text-amber-400'   },
+                { label: 'Жири',      value: round1(totals.fats    ?? 0), unit: 'г', color: 'text-blue-400'    },
               ].map(({ label, value, unit, color }) => (
                 <div key={label} className="text-center bg-surface-750 rounded-xl py-2">
                   <p className={`font-bold text-base ${color}`}>
@@ -131,15 +131,15 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <Card>
           <CardHeader
-            title="Weight Trend"
-            subtitle="Last 14 entries"
-            action={<Link to="/progress"><Button size="sm" variant="ghost">All</Button></Link>}
+            title="Динаміка ваги"
+            subtitle="Останні 14 записів"
+            action={<Link to="/progress"><Button size="sm" variant="ghost">Всі</Button></Link>}
           />
           {loadingWeight ? (
             <div className="h-40 skeleton rounded-xl" />
           ) : weightLogs.length === 0 ? (
             <div className="flex flex-col items-center py-8 text-slate-600">
-              <p className="text-caption">No weight entries</p>
+              <p className="text-caption">Записів ваги немає</p>
             </div>
           ) : (
             <div className="h-40">
@@ -153,12 +153,12 @@ export default function Dashboard() {
         </Card>
 
         <Card>
-          <CardHeader title="Macro Split" subtitle="Today" />
+          <CardHeader title="Розподіл макросів" subtitle="Сьогодні" />
           {loadingToday ? (
             <div className="h-40 skeleton rounded-xl" />
           ) : (totals.calories ?? 0) === 0 ? (
             <div className="flex flex-col items-center py-8 text-slate-600">
-              <p className="text-caption">No food logged yet</p>
+              <p className="text-caption">Їжу ще не внесено</p>
             </div>
           ) : (
             <div className="flex items-center gap-4">
@@ -170,9 +170,9 @@ export default function Dashboard() {
               </div>
               <div className="flex-1 space-y-2.5">
                 {[
-                  { label: 'Protein', pct: macros.protein, color: 'bg-brand-500' },
-                  { label: 'Carbs',   pct: macros.carbs,   color: 'bg-emerald-500' },
-                  { label: 'Fats',    pct: macros.fats,    color: 'bg-amber-500' },
+                  { label: 'Білки',     pct: macros.protein, color: 'bg-brand-500' },
+                  { label: 'Вуглеводи', pct: macros.carbs,   color: 'bg-emerald-500' },
+                  { label: 'Жири',      pct: macros.fats,    color: 'bg-amber-500' },
                 ].map(({ label, pct, color }) => (
                   <div key={label}>
                     <div className="flex justify-between text-caption mb-1">
@@ -195,12 +195,12 @@ export default function Dashboard() {
         <Card className="border-brand-500/20 bg-brand-500/5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-bold text-base text-white">Today's Workout</p>
+              <p className="font-bold text-base text-white">Тренування сьогодні</p>
               <p className="text-small text-slate-400 mt-0.5">
-                {sessions.length > 0 ? `${sessions[0]?.sets?.length ?? 0} sets logged` : 'No session started yet'}
+                {sessions.length > 0 ? `${sessions[0]?.sets?.length ?? 0} підходів внесено` : 'Сесію ще не розпочато'}
               </p>
             </div>
-            <Link to="/workouts"><Button>Start</Button></Link>
+            <Link to="/workouts"><Button>Розпочати</Button></Link>
           </div>
         </Card>
       </div>
@@ -208,10 +208,10 @@ export default function Dashboard() {
       {/* Weekly Activity + Latest PR */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         <Card>
-          <p className="text-caption text-slate-500 mb-1">This Week</p>
+          <p className="text-caption text-slate-500 mb-1">Цього тижня</p>
           <div className="flex items-end gap-1 mb-2">
             <span className="text-h2 font-bold text-white">{weeklyCount}</span>
-            <span className="text-small text-slate-500 mb-0.5">/ {WEEKLY_GOAL} workouts</span>
+            <span className="text-small text-slate-500 mb-0.5">/ {WEEKLY_GOAL} тренувань</span>
           </div>
           <div className="flex gap-1">
             {Array.from({ length: WEEKLY_GOAL }).map((_, i) => (
@@ -225,15 +225,15 @@ export default function Dashboard() {
         </Card>
 
         <Card>
-          <p className="text-caption text-slate-500 mb-1">Latest PR</p>
+          <p className="text-caption text-slate-500 mb-1">Останній рекорд</p>
           {latestPR ? (
             <>
               <p className="font-bold text-white text-sm truncate">{latestPR.exercise_name}</p>
-              <p className="text-small text-slate-400">{latestPR.best_weight} kg × {latestPR.best_reps} reps</p>
-              <p className="text-caption text-brand-400 mt-0.5">1RM ≈ {latestPR.estimated_1rm} kg</p>
+              <p className="text-small text-slate-400">{latestPR.best_weight} кг × {latestPR.best_reps} повт.</p>
+              <p className="text-caption text-brand-400 mt-0.5">1RM ≈ {latestPR.estimated_1rm} кг</p>
             </>
           ) : (
-            <p className="text-small text-slate-500 mt-1">No records yet</p>
+            <p className="text-small text-slate-500 mt-1">Рекордів ще немає</p>
           )}
         </Card>
       </div>
@@ -241,14 +241,14 @@ export default function Dashboard() {
       {/* Recent sessions */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <p className="section-title mb-0">Recent Workouts</p>
-          <Link to="/workouts/history" className="text-caption text-brand-400 hover:text-brand-300 font-medium">View all</Link>
+          <p className="section-title mb-0">Останні тренування</p>
+          <Link to="/workouts/history" className="text-caption text-brand-400 hover:text-brand-300 font-medium">Всі</Link>
         </div>
         {loadingWorkouts ? (
           <div className="space-y-2"><SkeletonCard /><SkeletonCard /></div>
         ) : sessions.length === 0 ? (
           <Card className="text-center py-8">
-            <p className="text-small text-slate-500">No workouts yet</p>
+            <p className="text-small text-slate-500">Тренувань ще немає</p>
           </Card>
         ) : (
           <div className="space-y-2">
@@ -256,10 +256,10 @@ export default function Dashboard() {
               <div key={s.id} className="flex items-center justify-between p-3 bg-surface-800 rounded-xl border border-surface-700/60">
                 <div>
                   <p className="text-small font-medium text-slate-200">{formatDate(s.date)}</p>
-                  <p className="text-caption text-slate-500">{s.sets?.length ?? 0} sets</p>
+                  <p className="text-caption text-slate-500">{s.sets?.length ?? 0} підходів</p>
                 </div>
                 <span className={`badge ${s.is_active ? 'bg-success/15 text-success' : 'bg-surface-700 text-slate-500'}`}>
-                  {s.is_active ? 'Active' : 'Done'}
+                  {s.is_active ? 'Активна' : 'Завершена'}
                 </span>
               </div>
             ))}
@@ -272,7 +272,7 @@ export default function Dashboard() {
 
 function getGreeting() {
   const h = new Date().getHours()
-  if (h < 12) return 'Good morning'
-  if (h < 17) return 'Good afternoon'
-  return 'Good evening'
+  if (h < 12) return 'Доброго ранку'
+  if (h < 17) return 'Добрий день'
+  return 'Добрий вечір'
 }

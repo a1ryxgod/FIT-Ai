@@ -42,16 +42,16 @@ export default function Members() {
   }
 
   return (
-    <Layout title="Members">
+    <Layout title="Учасники">
       <Card className="mb-4">
         <CardHeader
-          title="Team Members"
-          subtitle={isLoading ? 'Loading…' : `${members.length} member${members.length !== 1 ? 's' : ''}`}
+          title="Учасники команди"
+          subtitle={isLoading ? 'Завантаження…' : `${members.length} учасник${members.length !== 1 ? 'ів' : ''}`}
         />
         {isLoading ? (
-          <div className="py-8 text-center text-slate-500 text-small">Loading members…</div>
+          <div className="py-8 text-center text-slate-500 text-small">Завантаження учасників…</div>
         ) : members.length === 0 ? (
-          <div className="py-8 text-center text-slate-500 text-small">No members yet. Invite someone below.</div>
+          <div className="py-8 text-center text-slate-500 text-small">Учасників ще немає. Запросіть когось нижче.</div>
         ) : (
           <div>
             {members.map((m) => (
@@ -62,10 +62,10 @@ export default function Members() {
       </Card>
 
       <Card>
-        <CardHeader title="Invite Member" subtitle="Add a registered user to this gym" />
+        <CardHeader title="Запросити учасника" subtitle="Додайте зареєстрованого користувача до залу" />
         <form onSubmit={handleInvite} className="space-y-3">
           <Input
-            label="Username"
+            label="Логін"
             name="username"
             value={form.username}
             onChange={onChange}
@@ -73,15 +73,15 @@ export default function Members() {
             required
           />
           <div>
-            <label className="label">Role</label>
+            <label className="label">Роль</label>
             <select name="role" className="input" value={form.role} onChange={onChange}>
-              <option value="member">Member</option>
-              <option value="trainer">Trainer</option>
-              <option value="admin">Admin</option>
+              <option value="member">Учасник</option>
+              <option value="trainer">Тренер</option>
+              <option value="admin">Адмін</option>
             </select>
           </div>
           <Button type="submit" loading={inviting} fullWidth>
-            Send Invite
+            Надіслати запрошення
           </Button>
         </form>
       </Card>

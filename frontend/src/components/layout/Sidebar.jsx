@@ -4,23 +4,23 @@ import { useThemeStore } from '@/store/themeStore'
 import { useOrgStore } from '@/store/orgStore'
 
 const MEMBER_NAV = [
-  { to: '/', label: 'Dashboard', exact: true },
-  { to: '/workouts', label: 'Workouts' },
-  { to: '/nutrition', label: 'Nutrition' },
-  { to: '/progress', label: 'Progress' },
-  { to: '/ai', label: 'AI Coach' },
-  { to: '/profile', label: 'Profile' },
+  { to: '/', label: 'Головна', exact: true },
+  { to: '/workouts', label: 'Тренування' },
+  { to: '/nutrition', label: 'Харчування' },
+  { to: '/progress', label: 'Прогрес' },
+  { to: '/ai', label: 'AI Тренер' },
+  { to: '/profile', label: 'Профіль' },
 ]
 
 const ADMIN_NAV = [
-  { to: '/', label: 'Dashboard', exact: true },
-  { to: '/members', label: 'Members' },
-  { to: '/workouts', label: 'Workouts' },
-  { to: '/nutrition', label: 'Nutrition' },
-  { to: '/progress', label: 'Progress' },
-  { to: '/ai', label: 'AI Coach' },
-  { to: '/organizations', label: 'Organizations' },
-  { to: '/profile', label: 'Profile' },
+  { to: '/', label: 'Головна', exact: true },
+  { to: '/members', label: 'Учасники' },
+  { to: '/workouts', label: 'Тренування' },
+  { to: '/nutrition', label: 'Харчування' },
+  { to: '/progress', label: 'Прогрес' },
+  { to: '/ai', label: 'AI Тренер' },
+  { to: '/organizations', label: 'Організації' },
+  { to: '/profile', label: 'Профіль' },
 ]
 
 export default function Sidebar() {
@@ -45,7 +45,7 @@ export default function Sidebar() {
         </div>
         {currentOrg && (
           <div className="mt-3 px-3 py-2 rounded-xl" style={{ background: 'rgba(255,255,255,0.04)' }}>
-            <p className="text-[10px] text-slate-500 uppercase tracking-widest">Org</p>
+            <p className="text-[10px] text-slate-500 uppercase tracking-widest">Орг</p>
             <p className="text-small font-medium text-slate-200 truncate mt-0.5">{currentOrg.name}</p>
           </div>
         )}

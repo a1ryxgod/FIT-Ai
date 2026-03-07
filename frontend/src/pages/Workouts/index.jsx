@@ -37,12 +37,12 @@ export default function Workouts() {
   }
 
   return (
-    <Layout title="Workouts">
+    <Layout title="Тренування">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-h2">Training</h2>
+        <h2 className="text-h2">Тренування</h2>
         <div className="flex gap-2">
-          <Button variant="secondary" onClick={() => navigate('/workouts/history')} size="sm">History</Button>
-          <Button onClick={() => setShowCreateModal(true)} size="sm">+ Program</Button>
+          <Button variant="secondary" onClick={() => navigate('/workouts/history')} size="sm">Історія</Button>
+          <Button onClick={() => setShowCreateModal(true)} size="sm">+ Програма</Button>
         </div>
       </div>
 
@@ -55,9 +55,9 @@ export default function Workouts() {
         <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors" />
         <div className="relative flex items-center justify-between">
           <div>
-            <p className="text-white/70 text-caption uppercase tracking-wide">Free session</p>
-            <p className="text-white font-bold text-h2 mt-0.5">Quick Start</p>
-            <p className="text-white/60 text-small mt-1">Start without a program</p>
+            <p className="text-white/70 text-caption uppercase tracking-wide">Вільна сесія</p>
+            <p className="text-white font-bold text-h2 mt-0.5">Швидкий старт</p>
+            <p className="text-white/60 text-small mt-1">Розпочати без програми</p>
           </div>
           <div className="w-14 h-14 bg-white/15 rounded-2xl flex items-center justify-center">
             <span className="text-white font-black text-xl tracking-tight">GO</span>
@@ -71,14 +71,14 @@ export default function Workouts() {
       </div>
 
       {/* Programs */}
-      <p className="section-title">My Programs</p>
+      <p className="section-title">Мої програми</p>
       {isLoading ? (
         <SkeletonList count={3} />
       ) : programs.length === 0 ? (
         <EmptyState
-          title="No programs yet"
-          description="Create a workout program to structure your training"
-          action="Create Program"
+          title="Програм ще немає"
+          description="Створіть програму для структурування тренувань"
+          action="Створити програму"
           onAction={() => setShowCreateModal(true)}
         />
       ) : (
@@ -94,19 +94,19 @@ export default function Workouts() {
         </div>
       )}
 
-      <Modal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} title="New Program">
+      <Modal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} title="Нова програма">
         <div className="space-y-4">
           <Input
-            label="Program name"
+            label="Назва програми"
             value={programName}
             onChange={(e) => setProgramName(e.target.value)}
-            placeholder="e.g. Push Pull Legs"
+            placeholder="напр. Пуш Пул Ноги"
             autoFocus
             onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
           />
           <div className="flex gap-3">
-            <Button variant="secondary" onClick={() => setShowCreateModal(false)} fullWidth>Cancel</Button>
-            <Button onClick={handleCreate} loading={createProgram.isPending} fullWidth>Create</Button>
+            <Button variant="secondary" onClick={() => setShowCreateModal(false)} fullWidth>Скасувати</Button>
+            <Button onClick={handleCreate} loading={createProgram.isPending} fullWidth>Створити</Button>
           </div>
         </div>
       </Modal>
@@ -123,11 +123,11 @@ function ProgramCard({ program, onStart, loading }) {
         </div>
         <div className="min-w-0">
           <p className="font-semibold text-slate-100 text-small truncate">{program.name}</p>
-          <p className="text-caption text-slate-500">Created {formatDate(program.created_at)}</p>
+          <p className="text-caption text-slate-500">Створено {formatDate(program.created_at)}</p>
         </div>
       </div>
       <Button size="sm" onClick={onStart} loading={loading} className="flex-shrink-0">
-        Start
+        Розпочати
       </Button>
     </Card>
   )

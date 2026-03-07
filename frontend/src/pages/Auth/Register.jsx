@@ -22,11 +22,11 @@ export default function Register() {
 
   const validate = () => {
     const errs = {}
-    if (!form.username.trim()) errs.username = 'Required'
-    if (!form.email.trim()) errs.email = 'Required'
-    if (form.password.length < 8) errs.password = 'Min 8 characters'
-    if (form.password !== form.password2) errs.password2 = 'Passwords do not match'
-    if (!form.organization_name.trim()) errs.organization_name = 'Required'
+    if (!form.username.trim()) errs.username = "Обов'язкове поле"
+    if (!form.email.trim()) errs.email = "Обов'язкове поле"
+    if (form.password.length < 8) errs.password = 'Мін. 8 символів'
+    if (form.password !== form.password2) errs.password2 = 'Паролі не співпадають'
+    if (!form.organization_name.trim()) errs.organization_name = "Обов'язкове поле"
     return errs
   }
 
@@ -60,15 +60,15 @@ export default function Register() {
             style={{ background: 'rgb(var(--brand-500))' }}>
             FT
           </div>
-          <h1 className="text-h1 text-white">Create Account</h1>
-          <p className="text-slate-500 mt-1 text-small">Start your fitness journey</p>
+          <h1 className="text-h1 text-white">Створити акаунт</h1>
+          <p className="text-slate-500 mt-1 text-small">Почніть свій фітнес-шлях</p>
         </div>
 
         <div className="card p-6">
           <form onSubmit={onSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <Input
-                label="Username"
+                label="Логін"
                 name="username"
                 value={form.username}
                 onChange={onChange}
@@ -78,7 +78,7 @@ export default function Register() {
                 autoFocus
               />
               <Input
-                label="Email"
+                label="Пошта"
                 name="email"
                 type="email"
                 value={form.email}
@@ -89,44 +89,44 @@ export default function Register() {
               />
             </div>
             <Input
-              label="Organization / Gym name"
+              label="Назва організації / залу"
               name="organization_name"
               value={form.organization_name}
               onChange={onChange}
               error={errors.organization_name}
-              placeholder="My Gym"
+              placeholder="Мій зал"
               required
-              hint="You can invite members later"
+              hint="Учасників можна запросити пізніше"
             />
             <Input
-              label="Password"
+              label="Пароль"
               name="password"
               type="password"
               value={form.password}
               onChange={onChange}
               error={errors.password}
-              placeholder="Min 8 characters"
+              placeholder="Мін. 8 символів"
               required
             />
             <Input
-              label="Confirm Password"
+              label="Підтвердіть пароль"
               name="password2"
               type="password"
               value={form.password2}
               onChange={onChange}
               error={errors.password2}
-              placeholder="Repeat password"
+              placeholder="Повторіть пароль"
               required
             />
             <Button type="submit" fullWidth loading={loading} size="lg">
-              Create Account
+              Створити акаунт
             </Button>
           </form>
 
           <p className="text-center text-small text-slate-500 mt-5">
-            Already have an account?{' '}
+            Вже є акаунт?{' '}
             <Link to="/login" className="text-brand-400 hover:text-brand-300 font-medium">
-              Sign in
+              Увійти
             </Link>
           </p>
         </div>

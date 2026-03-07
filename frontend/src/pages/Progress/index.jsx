@@ -48,7 +48,7 @@ export default function Progress() {
   const chartData = {
     labels: sortedAsc.map((l) => formatDate(l.date)),
     datasets: [{
-      label: 'Weight (kg)',
+      label: 'Вага (кг)',
       data: sortedAsc.map((l) => l.weight),
       borderColor: '#6366f1',
       backgroundColor: 'rgba(99,102,241,0.1)',
@@ -72,7 +72,7 @@ export default function Progress() {
         titleColor: '#94a3b8',
         bodyColor: '#f1f5f9',
         callbacks: {
-          label: (ctx) => `Weight: ${ctx.parsed.y} kg`,
+          label: (ctx) => `Вага: ${ctx.parsed.y} кг`,
         },
       },
     },
@@ -83,24 +83,24 @@ export default function Progress() {
   }
 
   return (
-    <Layout title="Progress">
+    <Layout title="Прогрес">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-semibold text-slate-100">Weight Tracking</h2>
-        <Button onClick={() => setShowModal(true)} size="sm">+ Log Weight</Button>
+        <h2 className="text-lg font-semibold text-slate-100">Відстеження ваги</h2>
+        <Button onClick={() => setShowModal(true)} size="sm">+ Внести вагу</Button>
       </div>
 
       {/* Stats Row */}
       {logs.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-          <StatCard label="Current" value={latest ?? '—'} unit="kg" color="brand" />
+          <StatCard label="Поточна" value={latest ?? '—'} unit="кг" color="brand" />
           <StatCard
-            label="Change"
+            label="Зміна"
             value={diff != null ? (diff > 0 ? `+${diff}` : diff) : '—'}
-            unit={diff != null ? 'kg' : ''}
+            unit={diff != null ? 'кг' : ''}
             color={diff == null ? 'brand' : diff <= 0 ? 'green' : 'red'}
           />
-          <StatCard label="Min" value={min ?? '—'} unit={min != null ? 'kg' : ''} color="green" />
-          <StatCard label="Max" value={max ?? '—'} unit={max != null ? 'kg' : ''} color="red" />
+          <StatCard label="Мін" value={min ?? '—'} unit={min != null ? 'кг' : ''} color="green" />
+          <StatCard label="Макс" value={max ?? '—'} unit={max != null ? 'кг' : ''} color="red" />
         </div>
       )}
 
@@ -109,15 +109,15 @@ export default function Progress() {
         <div className="flex justify-center py-12"><Spinner /></div>
       ) : logs.length === 0 ? (
         <EmptyState
-          title="No weight logs yet"
-          description="Start tracking your weight to see progress over time"
-          action="Log Weight"
+          title="Записів ваги ще немає"
+          description="Починайте відстежувати вагу, щоб бачити прогрес"
+          action="Внести вагу"
           onAction={() => setShowModal(true)}
         />
       ) : (
         <>
           <Card className="mb-6">
-            <CardHeader title="Weight Over Time" subtitle={`${logs.length} entries`} />
+            <CardHeader title="Динаміка ваги" subtitle={`${logs.length} записів`} />
             <div className="h-64">
               <Line data={chartData} options={chartOptions} />
             </div>
@@ -125,7 +125,7 @@ export default function Progress() {
 
           {/* History Table */}
           <Card>
-            <CardHeader title="History" />
+            <CardHeader title="Історія" />
             <div className="space-y-2">
               {sortedDesc.map((log, i) => (
                 <div key={log.id} className="flex items-center justify-between py-2 border-b border-surface-700 last:border-0">
@@ -138,7 +138,7 @@ export default function Progress() {
                         {Math.abs(round1(log.weight - sortedDesc[i + 1].weight))}
                       </span>
                     )}
-                    <span className="font-medium text-slate-200">{log.weight} kg</span>
+                    <span className="font-medium text-slate-200">{log.weight} кг</span>
                   </div>
                 </div>
               ))}
@@ -147,11 +147,11 @@ export default function Progress() {
             {totalPages > 1 && (
               <div className="flex justify-center gap-2 mt-4">
                 <Button variant="secondary" size="sm" disabled={page === 1} onClick={() => setPage((p) => p - 1)}>
-                  Previous
+                  Попередня
                 </Button>
                 <span className="flex items-center text-sm text-slate-400">{page} / {totalPages}</span>
                 <Button variant="secondary" size="sm" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
-                  Next
+                  Наступна
                 </Button>
               </div>
             )}
@@ -161,12 +161,12 @@ export default function Progress() {
 
       {/* Personal Records */}
       <div className="mt-6">
-        <h2 className="text-lg font-semibold text-slate-100 mb-4">Personal Records</h2>
+        <h2 className="text-lg font-semibold text-slate-100 mb-4">Особисті рекорди</h2>
         {prsLoading ? (
           <div className="flex justify-center py-8"><Spinner /></div>
         ) : prs.length === 0 ? (
           <Card>
-            <p className="text-sm text-slate-500 text-center py-4">No workout data yet. Complete a workout to see your records.</p>
+            <p className="text-sm text-slate-500 text-center py-4">Тренувань ще немає. Завершіть тренування, щоб побачити рекорди.</p>
           </Card>
         ) : (
           <Card>
@@ -180,12 +180,12 @@ export default function Progress() {
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-slate-100 text-sm truncate">{pr.exercise_name}</p>
                     <p className={`text-xs capitalize ${MUSCLE_COLORS[pr.muscle_group] ?? 'text-slate-500'}`}>
-                      {pr.muscle_group ?? 'Other'} · {formatDate(pr.date)}
+                      {pr.muscle_group ?? 'Інше'} · {formatDate(pr.date)}
                     </p>
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="font-bold text-slate-100 text-sm">{pr.best_weight} kg × {pr.best_reps}</p>
-                    <p className="text-xs text-slate-500">1RM ≈ <span className="text-brand-400 font-semibold">{pr.estimated_1rm} kg</span></p>
+                    <p className="font-bold text-slate-100 text-sm">{pr.best_weight} кг × {pr.best_reps}</p>
+                    <p className="text-xs text-slate-500">1RM ≈ <span className="text-brand-400 font-semibold">{pr.estimated_1rm} кг</span></p>
                   </div>
                 </div>
               ))}
@@ -212,10 +212,10 @@ function LogWeightModal({ isOpen, onClose }) {
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Log Weight">
+    <Modal isOpen={isOpen} onClose={onClose} title="Внести вагу">
       <form onSubmit={handleSubmit} className="space-y-4">
         <Input
-          label="Weight (kg)"
+          label="Вага (кг)"
           type="number"
           step="0.1"
           min="1"
@@ -227,8 +227,8 @@ function LogWeightModal({ isOpen, onClose }) {
           autoFocus
         />
         <div className="flex gap-3">
-          <Button variant="secondary" onClick={onClose} type="button" fullWidth>Cancel</Button>
-          <Button type="submit" loading={logWeight.isPending} fullWidth>Log Weight</Button>
+          <Button variant="secondary" onClick={onClose} type="button" fullWidth>Скасувати</Button>
+          <Button type="submit" loading={logWeight.isPending} fullWidth>Внести вагу</Button>
         </div>
       </form>
     </Modal>

@@ -23,10 +23,10 @@ export default function Session() {
 
   if (!activeSession) {
     return (
-      <Layout title="Session">
+      <Layout title="Сесія">
         <div className="flex flex-col items-center justify-center py-24 text-center">
-          <p className="text-slate-400 mb-4">No active session</p>
-          <Button onClick={() => navigate('/workouts')}>Back to Workouts</Button>
+          <p className="text-slate-400 mb-4">Немає активної сесії</p>
+          <Button onClick={() => navigate('/workouts')}>До тренувань</Button>
         </div>
       </Layout>
     )
@@ -38,8 +38,8 @@ export default function Session() {
   const selected = exercises.find((e) => e.id === exerciseId)
 
   const handleAddSet = async () => {
-    if (!exerciseId) return toast.error('Select an exercise first')
-    if (!reps || !weight) return toast.error('Enter reps and weight')
+    if (!exerciseId) return toast.error('Спочатку оберіть вправу')
+    if (!reps || !weight) return toast.error('Введіть повтори та вагу')
     await addWorkoutSet({
       session_id: activeSession.id,
       exercise_id: exerciseId,
@@ -53,21 +53,21 @@ export default function Session() {
   const handleFinish = () => {
     clearSession()
     navigate('/workouts/history')
-    toast.success('Workout complete! 🎉')
+    toast.success('Тренування завершено!')
   }
 
   const totalVolume = sessionSets.reduce((sum, s) => sum + (s.reps * s.weight), 0)
 
   return (
-    <Layout title="Active Session">
+    <Layout title="Активна сесія">
       {/* Header with finish button */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <p className="text-caption text-slate-500">Session · {formatDate(activeSession.date)}</p>
-          <h2 className="text-h2">Workout</h2>
+          <p className="text-caption text-slate-500">Сесія · {formatDate(activeSession.date)}</p>
+          <h2 className="text-h2">Тренування</h2>
         </div>
         <Button variant="danger" onClick={handleFinish}>
-          Finish
+          Завершити
         </Button>
       </div>
 
@@ -76,20 +76,20 @@ export default function Session() {
         <div className="grid grid-cols-2 gap-3 mb-6">
           <Card className="text-center py-2">
             <p className="text-h2 font-bold text-brand-400">{sessionSets.length}</p>
-            <p className="text-caption text-slate-500">Sets Done</p>
+            <p className="text-caption text-slate-500">Підходів зроблено</p>
           </Card>
           <Card className="text-center py-2">
             <p className="text-h2 font-bold text-emerald-400">{Math.round(totalVolume)}</p>
-            <p className="text-caption text-slate-500">Total kg</p>
+            <p className="text-caption text-slate-500">Загальний кг</p>
           </Card>
         </div>
       )}
 
       {/* Exercise selector */}
       <Card className="mb-4">
-        <p className="section-title">Select Exercise</p>
+        <p className="section-title">Обрати вправу</p>
         <Input
-          placeholder="Search exercises..."
+          placeholder="Пошук вправ..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="mb-3"
@@ -99,7 +99,7 @@ export default function Session() {
         ) : (
           <div className="space-y-1 max-h-48 overflow-y-auto">
             {filtered.length === 0 && (
-              <p className="text-caption text-slate-500 text-center py-4">No exercises found</p>
+              <p className="text-caption text-slate-500 text-center py-4">Вправ не знайдено</p>
             )}
             {filtered.map((ex) => (
               <button
@@ -125,7 +125,7 @@ export default function Session() {
         )}
       </Card>
 
-      {/* Reps & Weight — BIG inputs, gym-friendly */}
+      {/* Reps & Weight */}
       {selected && (
         <Card className="mb-4">
           <div className="flex items-center gap-2 mb-4">
@@ -140,7 +140,7 @@ export default function Session() {
 
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
-              <label className="label">Reps</label>
+              <label className="label">Повтори</label>
               <input
                 type="number"
                 className="input text-center text-2xl font-bold py-4"
@@ -150,7 +150,6 @@ export default function Session() {
                 min="1"
                 inputMode="numeric"
               />
-              {/* Quick select */}
               <div className="flex gap-1.5 mt-2">
                 {[5, 8, 10, 12, 15].map((n) => (
                   <button
@@ -168,7 +167,7 @@ export default function Session() {
             </div>
 
             <div>
-              <label className="label">Weight (kg)</label>
+              <label className="label">Вага (кг)</label>
               <input
                 type="number"
                 className="input text-center text-2xl font-bold py-4"
@@ -179,7 +178,6 @@ export default function Session() {
                 min="0"
                 inputMode="decimal"
               />
-              {/* Quick adjust */}
               <div className="flex gap-1.5 mt-2">
                 {[-5, -2.5, +2.5, +5].map((delta) => (
                   <button
@@ -195,7 +193,6 @@ export default function Session() {
             </div>
           </div>
 
-          {/* Big ADD button — gym-friendly */}
           <button
             type="button"
             onClick={handleAddSet}
@@ -205,7 +202,7 @@ export default function Session() {
               background: loading ? '#3f3f48' : 'linear-gradient(135deg, rgb(var(--brand-600)), rgb(var(--brand-500)))',
             }}
           >
-            {loading ? '...' : '+ Add Set'}
+            {loading ? '...' : '+ Додати підхід'}
           </button>
         </Card>
       )}
@@ -213,7 +210,7 @@ export default function Session() {
       {/* Sets log */}
       {sessionSets.length > 0 && (
         <Card>
-          <p className="section-title">Sets Logged</p>
+          <p className="section-title">Внесені підходи</p>
           <div className="space-y-2">
             {[...sessionSets].reverse().map((set, i) => (
               <div key={set.id ?? i} className="flex items-center justify-between py-2.5 border-b border-surface-700/60 last:border-0">
@@ -222,13 +219,13 @@ export default function Session() {
                     {sessionSets.length - i}
                   </div>
                   <div>
-                    <p className="text-small font-medium text-slate-200">{set.exercise?.name ?? 'Exercise'}</p>
+                    <p className="text-small font-medium text-slate-200">{set.exercise?.name ?? 'Вправа'}</p>
                     <p className="text-caption text-slate-500">{set.exercise?.muscle_group}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-small font-bold text-slate-100">{set.reps} × {set.weight}kg</p>
-                  <p className="text-caption text-slate-500">{Math.round(set.reps * set.weight)} kg vol</p>
+                  <p className="text-small font-bold text-slate-100">{set.reps} × {set.weight}кг</p>
+                  <p className="text-caption text-slate-500">{Math.round(set.reps * set.weight)} кг об.</p>
                 </div>
               </div>
             ))}

@@ -22,9 +22,9 @@ export default function WorkoutHistory() {
   const totalPages = Math.ceil((data?.count ?? 0) / 10)
 
   return (
-    <Layout title="Workout History">
+    <Layout title="Історія тренувань">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-semibold text-slate-100">History</h2>
+        <h2 className="text-lg font-semibold text-slate-100">Історія</h2>
         <div className="flex items-center gap-2">
           {admin && (
             <button
@@ -36,11 +36,11 @@ export default function WorkoutHistory() {
               }`}
               style={showAll ? { background: 'rgba(var(--brand-500),0.1)' } : {}}
             >
-              {showAll ? 'All Members' : 'My History'}
+              {showAll ? 'Всі учасники' : 'Моя історія'}
             </button>
           )}
           <Button onClick={() => navigate('/workouts')} variant="secondary" size="sm">
-            Back
+            Назад
           </Button>
         </div>
       </div>
@@ -50,9 +50,9 @@ export default function WorkoutHistory() {
       ) : sessions.length === 0 ? (
         <EmptyState
           icon="📊"
-          title="No workout history"
-          description="Complete your first workout to see it here"
-          action="Start Workout"
+          title="Історія тренувань порожня"
+          description="Завершіть перше тренування, щоб побачити його тут"
+          action="Розпочати тренування"
           onAction={() => navigate('/workouts')}
         />
       ) : (
@@ -64,12 +64,12 @@ export default function WorkoutHistory() {
                   title={formatDate(session.date)}
                   subtitle={
                     showAll && session.user_username
-                      ? `${session.user_username} · ${session.program ? `Program: ${session.program}` : 'Free session'}`
-                      : session.program ? `Program: ${session.program}` : 'Free session'
+                      ? `${session.user_username} · ${session.program ? `Програма: ${session.program}` : 'Вільна сесія'}`
+                      : session.program ? `Програма: ${session.program}` : 'Вільна сесія'
                   }
                   action={
                     <span className={`badge ${session.is_active ? 'bg-emerald-500/20 text-emerald-300' : 'bg-surface-700 text-slate-400'}`}>
-                      {session.is_active ? 'Active' : 'Completed'}
+                      {session.is_active ? 'Активна' : 'Завершена'}
                     </span>
                   }
                 />
@@ -77,13 +77,13 @@ export default function WorkoutHistory() {
                   <div className="space-y-1.5 mt-2">
                     {session.sets.map((set, i) => (
                       <div key={set.id ?? i} className="flex items-center justify-between text-sm">
-                        <span className="text-slate-300">{set.exercise?.name ?? 'Exercise'}</span>
-                        <span className="text-slate-400">{set.reps} × {set.weight}kg</span>
+                        <span className="text-slate-300">{set.exercise?.name ?? 'Вправа'}</span>
+                        <span className="text-slate-400">{set.reps} × {set.weight}кг</span>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-xs text-slate-500 mt-1">No sets recorded</p>
+                  <p className="text-xs text-slate-500 mt-1">Підходів не внесено</p>
                 )}
               </Card>
             ))}
@@ -97,7 +97,7 @@ export default function WorkoutHistory() {
                 disabled={page === 1}
                 onClick={() => setPage((p) => p - 1)}
               >
-                Previous
+                Попередня
               </Button>
               <span className="flex items-center text-sm text-slate-400">
                 {page} / {totalPages}
@@ -108,7 +108,7 @@ export default function WorkoutHistory() {
                 disabled={page >= totalPages}
                 onClick={() => setPage((p) => p + 1)}
               >
-                Next
+                Наступна
               </Button>
             </div>
           )}

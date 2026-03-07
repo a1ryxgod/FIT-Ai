@@ -31,13 +31,13 @@ export default function Login() {
             FT
           </div>
           <h1 className="text-h1 text-white">FitTrack</h1>
-          <p className="text-slate-500 mt-1 text-small">Sign in to your account</p>
+          <p className="text-slate-500 mt-1 text-small">Увійдіть до свого акаунту</p>
         </div>
 
         <div className="card p-6">
           <form onSubmit={onSubmit} className="space-y-4">
             <Input
-              label="Username"
+              label="Логін"
               name="username"
               value={form.username}
               onChange={onChange}
@@ -47,7 +47,7 @@ export default function Login() {
               autoFocus
             />
             <Input
-              label="Password"
+              label="Пароль"
               name="password"
               type="password"
               value={form.password}
@@ -57,14 +57,14 @@ export default function Login() {
               autoComplete="current-password"
             />
             <Button type="submit" fullWidth loading={loading} size="lg" className="mt-2">
-              Sign In
+              Увійти
             </Button>
           </form>
 
           <p className="text-center text-small text-slate-500 mt-5">
-            Don't have an account?{' '}
+            Немає акаунту?{' '}
             <Link to="/register" className="text-brand-400 hover:text-brand-300 font-medium">
-              Create one
+              Створити
             </Link>
           </p>
         </div>

@@ -3,21 +3,21 @@ import { clsx } from 'clsx'
 import { useOrgStore } from '@/store/orgStore'
 
 const MEMBER_NAV = [
-  { to: '/', label: 'Home', exact: true },
-  { to: '/workouts', label: 'Train' },
-  { to: '/nutrition', label: 'Eat' },
+  { to: '/', label: 'Головна', exact: true },
+  { to: '/workouts', label: 'Трен.' },
+  { to: '/nutrition', label: 'Їжа' },
   { to: '/ai', label: 'AI' },
-  { to: '/progress', label: 'Stats' },
-  { to: '/profile', label: 'Profile' },
+  { to: '/progress', label: 'Прогрес' },
+  { to: '/profile', label: 'Профіль' },
 ]
 
 const ADMIN_NAV = [
-  { to: '/', label: 'Home', exact: true },
-  { to: '/workouts', label: 'Train' },
-  { to: '/members', label: 'Members' },
+  { to: '/', label: 'Головна', exact: true },
+  { to: '/workouts', label: 'Трен.' },
+  { to: '/members', label: 'Учасники' },
   { to: '/ai', label: 'AI' },
-  { to: '/progress', label: 'Stats' },
-  { to: '/profile', label: 'Profile' },
+  { to: '/progress', label: 'Прогрес' },
+  { to: '/profile', label: 'Профіль' },
 ]
 
 export default function MobileNav() {

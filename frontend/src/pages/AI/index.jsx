@@ -3,13 +3,12 @@ import Layout from '@/components/layout/Layout'
 import Button from '@/components/ui/Button'
 import Spinner from '@/components/ui/Spinner'
 import { useChatHistory, useSendMessage, useAnalyzeWorkouts } from '@/hooks/useAI'
-import { formatDate } from '@/utils/helpers'
 
 const QUICK_PROMPTS = [
-  'How is my nutrition today?',
-  'Am I eating enough protein?',
-  'How can I improve my workouts?',
-  'What should I eat for my goal?',
+  'Як моє харчування сьогодні?',
+  'Чи достатньо я їм білків?',
+  'Як покращити мої тренування?',
+  'Що мені їсти для досягнення цілі?',
 ]
 
 export default function AIChat() {
@@ -23,7 +22,6 @@ export default function AIChat() {
 
   const isPending = sendMessage.isPending || analyzeWorkouts.isPending
 
-  // Optimistic local messages for instant UI feedback
   const [optimistic, setOptimistic] = useState([])
   const allMessages = [...messages, ...optimistic]
 
@@ -39,9 +37,8 @@ export default function AIChat() {
     setOptimistic((prev) => [...prev, { role: 'user', message: msg, id: Date.now() }])
 
     try {
-      const { data } = await sendMessage.mutateAsync(msg)
+      await sendMessage.mutateAsync(msg)
       setOptimistic([])
-      // history is refetched automatically via invalidateQueries
     } catch {
       setOptimistic([])
     }
@@ -51,7 +48,7 @@ export default function AIChat() {
     if (isPending) return
     setOptimistic((prev) => [
       ...prev,
-      { role: 'user', message: 'Analyze my workout training', id: Date.now() },
+      { role: 'user', message: 'Проаналізуй моє тренування', id: Date.now() },
     ])
     try {
       const { data } = await analyzeWorkouts.mutateAsync()
@@ -65,7 +62,7 @@ export default function AIChat() {
   }
 
   return (
-    <Layout title="AI Coach">
+    <Layout title="AI Тренер">
       <div className="flex flex-col h-[calc(100vh-8rem)] max-h-[800px]">
 
         {/* Messages area */}
@@ -89,9 +86,6 @@ export default function AIChat() {
           <div ref={bottomRef} />
         </div>
 
-        {/* Analyze workouts shortcut */}
-        {allMessages.length === 0 && !historyLoading && null}
-
         {/* Input area */}
         <div className="pt-3 border-t border-surface-700">
           <div className="flex gap-2 items-end">
@@ -102,7 +96,6 @@ export default function AIChat() {
                 value={input}
                 onChange={(e) => {
                   setInput(e.target.value)
-                  // Auto-grow
                   e.target.style.height = 'auto'
                   e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px'
                 }}
@@ -112,7 +105,7 @@ export default function AIChat() {
                     handleSend()
                   }
                 }}
-                placeholder="Ask about your nutrition, workouts..."
+                placeholder="Запитайте про харчування, тренування..."
                 disabled={isPending}
                 className="input resize-none w-full py-3 pr-4 overflow-hidden leading-snug"
                 style={{ minHeight: '48px', maxHeight: '120px' }}
@@ -124,7 +117,7 @@ export default function AIChat() {
               loading={sendMessage.isPending}
               className="shrink-0"
             >
-              Send
+              Надіслати
             </Button>
           </div>
           <button
@@ -132,7 +125,7 @@ export default function AIChat() {
             disabled={isPending}
             className="mt-2 w-full text-center text-caption text-brand-400 hover:text-brand-300 transition-colors disabled:opacity-40"
           >
-            Analyze my workouts
+            Аналіз моїх тренувань
           </button>
         </div>
       </div>
@@ -147,9 +140,9 @@ function EmptyChat({ onPrompt }) {
         style={{ background: 'rgb(var(--brand-500))' }}>
         AI
       </div>
-      <h3 className="text-small font-semibold text-slate-300 mb-1">Your AI Fitness Coach</h3>
+      <h3 className="text-small font-semibold text-slate-300 mb-1">Ваш AI фітнес-тренер</h3>
       <p className="text-caption text-slate-600 mb-6 max-w-xs">
-        Ask about your nutrition, workouts, or get personalized fitness advice.
+        Запитуйте про харчування, тренування або отримуйте персональні поради.
       </p>
       <div className="grid grid-cols-1 gap-2 w-full max-w-xs">
         {QUICK_PROMPTS.map((prompt) => (

@@ -59,10 +59,10 @@ export default function Organizations() {
   }
 
   return (
-    <Layout title="Organizations">
+    <Layout title="Організації">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-semibold text-slate-100">Your Organizations</h2>
-        <Button onClick={() => setShowCreateModal(true)} size="sm">+ Create</Button>
+        <h2 className="text-lg font-semibold text-slate-100">Ваші організації</h2>
+        <Button onClick={() => setShowCreateModal(true)} size="sm">+ Створити</Button>
       </div>
 
       {loadingOrgs ? (
@@ -71,9 +71,9 @@ export default function Organizations() {
         <Card>
           <div className="flex flex-col items-center py-12 text-slate-500">
             <span className="text-4xl mb-3">🏢</span>
-            <p className="text-sm">No organizations found</p>
+            <p className="text-sm">Організацій не знайдено</p>
             <Button size="sm" className="mt-3" onClick={() => setShowCreateModal(true)}>
-              Create Organization
+              Створити організацію
             </Button>
           </div>
         </Card>
@@ -96,7 +96,7 @@ export default function Organizations() {
                     <div>
                       <div className="flex items-center gap-2">
                         <p className="font-semibold text-slate-100">{org.name}</p>
-                        {isActive && <Badge color="active">Active</Badge>}
+                        {isActive && <Badge color="active">Активна</Badge>}
                       </div>
                       <p className="text-xs text-slate-500">@{org.slug}</p>
                     </div>
@@ -112,7 +112,7 @@ export default function Organizations() {
                         onClick={() => handleSwitch(org)}
                         loading={switchLoading}
                       >
-                        Switch
+                        Переключити
                       </Button>
                     )}
                   </div>
@@ -127,43 +127,43 @@ export default function Organizations() {
       {currentOrg && isAdmin() && (
         <div className="mt-8">
           <h3 className="text-sm font-medium text-slate-400 uppercase tracking-wide mb-3">
-            Manage: {currentOrg.name}
+            Управління: {currentOrg.name}
           </h3>
           <Card>
-            <CardHeader title="Team Management" subtitle="Invite members to your organization" />
+            <CardHeader title="Управління командою" subtitle="Запросіть учасників до вашої організації" />
             <Button
               size="sm"
               onClick={() => setShowInviteModal(true)}
             >
-              Invite Member
+              Запросити учасника
             </Button>
           </Card>
         </div>
       )}
 
       {/* Create Modal */}
-      <Modal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} title="New Organization">
+      <Modal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} title="Нова організація">
         <div className="space-y-4">
           <Input
-            label="Organization name"
+            label="Назва організації"
             value={orgName}
             onChange={(e) => setOrgName(e.target.value)}
-            placeholder="My Gym"
+            placeholder="Мій зал"
             autoFocus
             onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
           />
           <div className="flex gap-3">
-            <Button variant="secondary" onClick={() => setShowCreateModal(false)} fullWidth>Cancel</Button>
-            <Button onClick={handleCreate} loading={createLoading} fullWidth>Create</Button>
+            <Button variant="secondary" onClick={() => setShowCreateModal(false)} fullWidth>Скасувати</Button>
+            <Button onClick={handleCreate} loading={createLoading} fullWidth>Створити</Button>
           </div>
         </div>
       </Modal>
 
       {/* Invite Modal */}
-      <Modal isOpen={showInviteModal} onClose={() => setShowInviteModal(false)} title="Invite Member">
+      <Modal isOpen={showInviteModal} onClose={() => setShowInviteModal(false)} title="Запросити учасника">
         <form onSubmit={handleInvite} className="space-y-4">
           <Input
-            label="Username"
+            label="Логін"
             value={inviteForm.username}
             onChange={(e) => setInviteForm((p) => ({ ...p, username: e.target.value }))}
             placeholder="john_doe"
@@ -171,23 +171,23 @@ export default function Organizations() {
             autoFocus
           />
           <div>
-            <label className="label">Role</label>
+            <label className="label">Роль</label>
             <select
               className="input"
               value={inviteForm.role}
               onChange={(e) => setInviteForm((p) => ({ ...p, role: e.target.value }))}
             >
-              <option value="member">Member</option>
-              <option value="trainer">Trainer</option>
-              <option value="admin">Admin</option>
+              <option value="member">Учасник</option>
+              <option value="trainer">Тренер</option>
+              <option value="admin">Адмін</option>
             </select>
           </div>
           <div className="flex gap-3">
             <Button variant="secondary" type="button" onClick={() => setShowInviteModal(false)} fullWidth>
-              Cancel
+              Скасувати
             </Button>
             <Button type="submit" loading={inviteLoading} fullWidth>
-              Invite
+              Запросити
             </Button>
           </div>
         </form>

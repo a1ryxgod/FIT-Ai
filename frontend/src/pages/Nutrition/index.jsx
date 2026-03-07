@@ -9,12 +9,11 @@ import { useTodaySummary, useFoodProducts, useLogFood } from '@/hooks/useNutriti
 import { useProfileData } from '@/hooks/useAuth'
 import { round1 } from '@/utils/helpers'
 
-// Meal type grouping matching MyFitnessPal pattern
 const MEAL_TYPES = [
-  { key: 'breakfast', label: 'Breakfast', abbr: 'AM' },
-  { key: 'lunch',     label: 'Lunch',     abbr: '12' },
-  { key: 'dinner',    label: 'Dinner',    abbr: 'PM' },
-  { key: 'snack',     label: 'Snacks',    abbr: '+' },
+  { key: 'breakfast', label: 'Сніданок', abbr: 'AM' },
+  { key: 'lunch',     label: 'Обід',     abbr: '12' },
+  { key: 'dinner',    label: 'Вечеря',   abbr: 'PM' },
+  { key: 'snack',     label: 'Перекус',  abbr: '+' },
 ]
 
 export default function Nutrition() {
@@ -33,7 +32,6 @@ export default function Nutrition() {
   const totals = todayData?.totals ?? {}
   const logs   = todayData?.logs   ?? []
 
-  // Group logs by meal_type (fallback: all under 'lunch' if no meal_type field)
   const byMeal = MEAL_TYPES.reduce((acc, { key }) => {
     acc[key] = logs.filter((l) => (l.meal_type ?? 'lunch') === key)
     return acc
@@ -45,12 +43,12 @@ export default function Nutrition() {
   }
 
   return (
-    <Layout title="Nutrition">
+    <Layout title="Харчування">
       {/* Calorie header */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-h2">Today</h2>
-          <Button onClick={() => setShowLogModal(true)} size="sm">+ Log Food</Button>
+          <h2 className="text-h2">Сьогодні</h2>
+          <Button onClick={() => setShowLogModal(true)} size="sm">+ Додати їжу</Button>
         </div>
 
         {loadingToday ? <SkeletonStatRow /> : (
@@ -58,13 +56,12 @@ export default function Nutrition() {
             {/* Hero calorie card */}
             <Card className="mb-4">
               <div className="text-center mb-3">
-                <p className="text-caption text-slate-500">Calories Consumed</p>
+                <p className="text-caption text-slate-500">Спожито калорій</p>
                 <div className="flex items-end justify-center gap-1 mt-1">
                   <span className="text-[40px] font-bold text-white leading-none">{Math.round(totals.calories ?? 0)}</span>
-                  <span className="text-small text-slate-500 mb-1">/ {MACRO_GOALS.calories} kcal</span>
+                  <span className="text-small text-slate-500 mb-1">/ {MACRO_GOALS.calories} ккал</span>
                 </div>
               </div>
-              {/* Main progress ring placeholder — simple bar */}
               <div className="progress-track h-3 mb-4">
                 <div
                   className="progress-fill h-3 rounded-full"
@@ -77,21 +74,21 @@ export default function Nutrition() {
               {/* Macro row */}
               <div className="grid grid-cols-3 gap-3">
                 {[
-                  { label: 'Protein', val: totals.protein ?? 0, goal: MACRO_GOALS.protein, color: 'bg-emerald-500', textColor: 'text-emerald-400' },
-                  { label: 'Carbs',   val: totals.carbs   ?? 0, goal: MACRO_GOALS.carbs,   color: 'bg-amber-500',   textColor: 'text-amber-400'   },
-                  { label: 'Fats',    val: totals.fats    ?? 0, goal: MACRO_GOALS.fats,    color: 'bg-blue-500',    textColor: 'text-blue-400'    },
+                  { label: 'Білки',     val: totals.protein ?? 0, goal: MACRO_GOALS.protein, color: 'bg-emerald-500', textColor: 'text-emerald-400' },
+                  { label: 'Вуглеводи', val: totals.carbs   ?? 0, goal: MACRO_GOALS.carbs,   color: 'bg-amber-500',   textColor: 'text-amber-400'   },
+                  { label: 'Жири',      val: totals.fats    ?? 0, goal: MACRO_GOALS.fats,    color: 'bg-blue-500',    textColor: 'text-blue-400'    },
                 ].map(({ label, val, goal, color, textColor }) => {
                   const pct = Math.min(100, Math.round((val / goal) * 100))
                   return (
                     <div key={label} className="bg-surface-750 rounded-xl p-3">
                       <p className={`text-base font-bold ${textColor}`}>
-                        {round1(val)}<span className="text-caption font-normal text-slate-500 ml-0.5">g</span>
+                        {round1(val)}<span className="text-caption font-normal text-slate-500 ml-0.5">г</span>
                       </p>
                       <p className="text-caption text-slate-500 mb-1.5">{label}</p>
                       <div className="progress-track h-1">
                         <div className={`progress-fill h-1 ${color}`} style={{ width: `${pct}%` }} />
                       </div>
-                      <p className="text-[10px] text-slate-600 mt-0.5">{pct}% of goal</p>
+                      <p className="text-[10px] text-slate-600 mt-0.5">{pct}% від цілі</p>
                     </div>
                   )
                 })}
@@ -103,7 +100,7 @@ export default function Nutrition() {
 
       {/* Meal sections */}
       <div>
-        <p className="section-title">Food Log</p>
+        <p className="section-title">Журнал харчування</p>
         {loadingToday ? (
           <SkeletonList count={2} />
         ) : (
@@ -122,17 +119,17 @@ export default function Nutrition() {
                       <div>
                         <p className="font-semibold text-slate-100 text-small">{label}</p>
                         {mealLogs.length > 0 && (
-                          <p className="text-caption text-slate-500">{round1(mealCals)} kcal</p>
+                          <p className="text-caption text-slate-500">{round1(mealCals)} ккал</p>
                         )}
                       </div>
                     </div>
                     <Button size="sm" variant="ghost" onClick={() => handleAddFood(key)}>
-                      + Add
+                      + Додати
                     </Button>
                   </div>
 
                   {mealLogs.length === 0 ? (
-                    <p className="text-caption text-slate-600 text-center py-2">Nothing logged</p>
+                    <p className="text-caption text-slate-600 text-center py-2">Нічого не внесено</p>
                   ) : (
                     <div className="space-y-2">
                       {mealLogs.map((log) => (
@@ -163,13 +160,13 @@ function FoodRow({ log }) {
     <div className="flex items-center justify-between py-2 border-b border-surface-700/60 last:border-0">
       <div className="min-w-0">
         <p className="text-small font-medium text-slate-200 truncate">{product.name}</p>
-        <p className="text-caption text-slate-500">{log.grams}g</p>
+        <p className="text-caption text-slate-500">{log.grams}г</p>
       </div>
       <div className="flex gap-3 text-caption flex-shrink-0 ml-3">
-        <span className="text-slate-300 font-medium">{round1((product.calories ?? 0) * factor)}<span className="text-slate-600 ml-0.5">kcal</span></span>
-        <span className="text-emerald-400 hidden sm:inline">{round1((product.protein ?? 0) * factor)}P</span>
-        <span className="text-amber-400 hidden sm:inline">{round1((product.carbs ?? 0) * factor)}C</span>
-        <span className="text-blue-400 hidden sm:inline">{round1((product.fats ?? 0) * factor)}F</span>
+        <span className="text-slate-300 font-medium">{round1((product.calories ?? 0) * factor)}<span className="text-slate-600 ml-0.5">ккал</span></span>
+        <span className="text-emerald-400 hidden sm:inline">{round1((product.protein ?? 0) * factor)}Б</span>
+        <span className="text-amber-400 hidden sm:inline">{round1((product.carbs ?? 0) * factor)}В</span>
+        <span className="text-blue-400 hidden sm:inline">{round1((product.fats ?? 0) * factor)}Ж</span>
       </div>
     </div>
   )
@@ -198,7 +195,7 @@ function LogFoodModal({ isOpen, onClose, defaultMeal = 'lunch' }) {
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Log Food" size="lg">
+    <Modal isOpen={isOpen} onClose={onClose} title="Додати їжу" size="lg">
       <div className="space-y-4">
         {/* Meal selector */}
         <div className="flex gap-2">
@@ -221,10 +218,10 @@ function LogFoodModal({ isOpen, onClose, defaultMeal = 'lunch' }) {
         </div>
 
         <Input
-          label="Search food"
+          label="Пошук їжі"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Chicken breast, oats..."
+          placeholder="Куряча грудка, вівсянка..."
           autoFocus
         />
 
@@ -233,7 +230,7 @@ function LogFoodModal({ isOpen, onClose, defaultMeal = 'lunch' }) {
           {isLoading ? (
             <SkeletonList count={3} />
           ) : products.length === 0 ? (
-            <p className="text-caption text-slate-500 text-center py-6">No products found</p>
+            <p className="text-caption text-slate-500 text-center py-6">Продуктів не знайдено</p>
           ) : (
             products.map((p) => (
               <button
@@ -248,7 +245,7 @@ function LogFoodModal({ isOpen, onClose, defaultMeal = 'lunch' }) {
               >
                 <span className="font-medium">{p.name}</span>
                 <span className="text-caption text-slate-500 ml-2">
-                  {p.calories} kcal · P:{p.protein} C:{p.carbs} F:{p.fats} (per 100g)
+                  {p.calories} ккал · Б:{p.protein} В:{p.carbs} Ж:{p.fats} (на 100г)
                 </span>
               </button>
             ))
@@ -259,7 +256,7 @@ function LogFoodModal({ isOpen, onClose, defaultMeal = 'lunch' }) {
           <div className="bg-brand-500/10 border border-brand-500/20 rounded-xl p-3">
             <p className="text-small font-semibold text-brand-400 mb-2">{selectedProduct.name}</p>
             <Input
-              label="Grams"
+              label="Грами"
               type="number"
               min="1"
               value={grams}
@@ -268,17 +265,17 @@ function LogFoodModal({ isOpen, onClose, defaultMeal = 'lunch' }) {
             />
             {grams && (
               <p className="text-caption text-slate-400 mt-2">
-                ≈ <strong className="text-slate-200">{round1(selectedProduct.calories * parseFloat(grams) / 100)}</strong> kcal ·{' '}
-                <strong className="text-emerald-400">{round1(selectedProduct.protein * parseFloat(grams) / 100)}g</strong> protein
+                ≈ <strong className="text-slate-200">{round1(selectedProduct.calories * parseFloat(grams) / 100)}</strong> ккал ·{' '}
+                <strong className="text-emerald-400">{round1(selectedProduct.protein * parseFloat(grams) / 100)}г</strong> білків
               </p>
             )}
           </div>
         )}
 
         <div className="flex gap-3">
-          <Button variant="secondary" onClick={onClose} fullWidth>Cancel</Button>
+          <Button variant="secondary" onClick={onClose} fullWidth>Скасувати</Button>
           <Button onClick={handleLog} loading={logFood.isPending} disabled={!selectedProduct} fullWidth>
-            Log Food
+            Додати їжу
           </Button>
         </div>
       </div>

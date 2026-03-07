@@ -15,11 +15,11 @@ import { authApi } from '@/api/auth'
 import toast from 'react-hot-toast'
 
 const ACTIVITY_LABELS = {
-  sedentary: 'Sedentary',
-  lightly_active: 'Lightly Active',
-  moderately_active: 'Moderately Active',
-  very_active: 'Very Active',
-  extra_active: 'Extra Active',
+  sedentary: 'Малорухливий',
+  lightly_active: 'Невисока активність',
+  moderately_active: 'Помірна активність',
+  very_active: 'Висока активність',
+  extra_active: 'Дуже висока активність',
 }
 
 export default function Profile() {
@@ -69,14 +69,14 @@ export default function Profile() {
     const w = parseFloat(profileForm.weight)
     const h = parseFloat(profileForm.height)
     const a = parseFloat(profileForm.age)
-    if (!w || !h || !a) { toast.error('Fill in weight, height and age first'); return }
+    if (!w || !h || !a) { toast.error('Спочатку введіть вагу, зріст та вік'); return }
     const bmr = 10 * w + 6.25 * h - 5 * a + 5
     const tdee = Math.round(bmr * (ACTIVITY_MULTIPLIERS[profileForm.activity_level] ?? 1.55))
     const protein = Math.round(w * 2)
     const fat = Math.round((tdee * 0.25) / 9)
     const carbs = Math.round((tdee - protein * 4 - fat * 9) / 4)
     setProfileForm((p) => ({ ...p, calorie_goal: tdee, protein_goal: protein, fat_goal: fat, carbs_goal: carbs }))
-    toast.success('TDEE calculated')
+    toast.success('TDEE розраховано')
   }
 
   const onChange = (e) => setProfileForm((p) => ({ ...p, [e.target.name]: e.target.value }))
@@ -90,7 +90,7 @@ export default function Profile() {
     try { if (refreshToken) await authApi.logout(refreshToken) } catch {}
     logout()
     navigate('/login')
-    toast.success('Logged out')
+    toast.success('Вихід виконано')
   }
 
   const handleSwitchOrg = async (org) => {
@@ -104,14 +104,14 @@ export default function Profile() {
     : null
 
   const bmiLabel = bmi
-    ? bmi < 18.5 ? { text: 'Underweight', color: 'text-blue-400' }
-    : bmi < 25   ? { text: 'Normal', color: 'text-success' }
-    : bmi < 30   ? { text: 'Overweight', color: 'text-warning' }
-    : { text: 'Obese', color: 'text-danger' }
+    ? bmi < 18.5 ? { text: 'Недовага', color: 'text-blue-400' }
+    : bmi < 25   ? { text: 'Норма', color: 'text-success' }
+    : bmi < 30   ? { text: 'Надвага', color: 'text-warning' }
+    : { text: 'Ожиріння', color: 'text-danger' }
     : null
 
   return (
-    <Layout title="Profile">
+    <Layout title="Профіль">
       {/* User header */}
       <div className="flex items-center gap-4 mb-6">
         <div className="w-16 h-16 bg-brand-500/20 border-2 border-brand-500/40 rounded-full flex items-center justify-center text-2xl font-bold text-brand-400">
@@ -133,7 +133,7 @@ export default function Profile() {
       {bmi && (
         <Card className="mb-4 flex items-center justify-between">
           <div>
-            <p className="text-caption text-slate-500">BMI Index</p>
+            <p className="text-caption text-slate-500">ІМТ</p>
             <p className={`text-h2 font-bold ${bmiLabel.color}`}>{bmi}</p>
           </div>
           <span className={`text-small font-semibold ${bmiLabel.color}`}>{bmiLabel.text}</span>
@@ -142,40 +142,40 @@ export default function Profile() {
 
       {/* Body stats form */}
       <Card className="mb-4">
-        <CardHeader title="Body Stats" subtitle="Used for nutrition calculations" />
+        <CardHeader title="Параметри тіла" subtitle="Використовується для розрахунку харчування" />
         <form onSubmit={handleSave} className="space-y-4">
           <div className="grid grid-cols-3 gap-3">
             <Input
-              label="Height"
+              label="Зріст"
               name="height"
               type="number"
               value={profileForm.height}
               onChange={onChange}
               placeholder="175"
-              hint="cm"
+              hint="см"
             />
             <Input
-              label="Weight"
+              label="Вага"
               name="weight"
               type="number"
               step="0.1"
               value={profileForm.weight}
               onChange={onChange}
               placeholder="75"
-              hint="kg"
+              hint="кг"
             />
             <Input
-              label="Age"
+              label="Вік"
               name="age"
               type="number"
               value={profileForm.age}
               onChange={onChange}
               placeholder="25"
-              hint="years"
+              hint="р."
             />
           </div>
           <div>
-            <label className="label">Activity Level</label>
+            <label className="label">Рівень активності</label>
             <select
               name="activity_level"
               className="input"
@@ -188,7 +188,7 @@ export default function Profile() {
             </select>
           </div>
           <Button type="submit" loading={savingProfile} fullWidth>
-            Save Profile
+            Зберегти профіль
           </Button>
         </form>
       </Card>
@@ -196,64 +196,64 @@ export default function Profile() {
       {/* Nutrition Goals */}
       <Card className="mb-4">
         <CardHeader
-          title="Nutrition Goals"
-          subtitle="Daily targets for tracking"
+          title="Цілі харчування"
+          subtitle="Денні цілі для відстеження"
           action={
             <button
               type="button"
               onClick={calcTDEE}
               className="text-[11px] font-semibold px-3 py-1.5 rounded-lg border border-brand-500/30 text-brand-400 transition-colors hover:bg-brand-500/10"
             >
-              Auto-calculate
+              Авторозрахунок
             </button>
           }
         />
         <div className="grid grid-cols-2 gap-3 mt-3">
           <Input
-            label="Calories"
+            label="Калорії"
             name="calorie_goal"
             type="number"
             value={profileForm.calorie_goal}
             onChange={onChange}
-            hint="kcal"
+            hint="ккал"
           />
           <Input
-            label="Protein"
+            label="Білки"
             name="protein_goal"
             type="number"
             value={profileForm.protein_goal}
             onChange={onChange}
-            hint="g"
+            hint="г"
           />
           <Input
-            label="Carbs"
+            label="Вуглеводи"
             name="carbs_goal"
             type="number"
             value={profileForm.carbs_goal}
             onChange={onChange}
-            hint="g"
+            hint="г"
           />
           <Input
-            label="Fat"
+            label="Жири"
             name="fat_goal"
             type="number"
             value={profileForm.fat_goal}
             onChange={onChange}
-            hint="g"
+            hint="г"
           />
         </div>
         <Button type="button" onClick={handleSave} loading={savingProfile} fullWidth className="mt-4">
-          Save Goals
+          Зберегти цілі
         </Button>
       </Card>
 
       {/* Organization section */}
       <Card className="mb-4">
         <CardHeader
-          title="Organization"
+          title="Організація"
           action={
             <Button size="sm" variant="secondary" onClick={() => setShowOrgModal(true)}>
-              Switch
+              Змінити
             </Button>
           }
         />
@@ -268,7 +268,7 @@ export default function Profile() {
             </div>
           </div>
         ) : (
-          <p className="text-small text-slate-500">No organization selected</p>
+          <p className="text-small text-slate-500">Організацію не обрано</p>
         )}
       </Card>
 
@@ -290,14 +290,14 @@ export default function Profile() {
         onClick={handleLogout}
         className="btn-danger w-full"
       >
-        Sign Out
+        Вийти
       </button>
 
       {/* Org switch modal */}
-      <Modal isOpen={showOrgModal} onClose={() => setShowOrgModal(false)} title="Switch Organization">
+      <Modal isOpen={showOrgModal} onClose={() => setShowOrgModal(false)} title="Змінити організацію">
         <div className="space-y-2">
           {organizations.length === 0 ? (
-            <p className="text-small text-slate-500 text-center py-4">No organizations</p>
+            <p className="text-small text-slate-500 text-center py-4">Немає організацій</p>
           ) : (
             organizations.map((org) => {
               const isActive = currentOrg?.id === org.id
@@ -321,7 +321,7 @@ export default function Profile() {
                     <p className="font-medium text-slate-100 text-small">{org.name}</p>
                     <p className="text-caption text-slate-500">@{org.slug}</p>
                   </div>
-                  {isActive && <span className="text-caption text-brand-400 font-semibold">Active</span>}
+                  {isActive && <span className="text-caption text-brand-400 font-semibold">Активна</span>}
                 </button>
               )
             })
