@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.http import JsonResponse
+from django.shortcuts import redirect
 from django.urls import include, path
 from drf_spectacular.views import (
     SpectacularAPIView,
@@ -13,6 +14,7 @@ def health_check(request):
 
 
 urlpatterns = [
+    path("", lambda request: redirect("/api/docs/")),
     path("health/", health_check, name="health"),
     path("admin/", admin.site.urls),
     path("api/auth/", include("apps.users.urls")),
