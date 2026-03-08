@@ -142,6 +142,7 @@ class WorkoutHistoryView(ListAPIView):
             return qs.select_related("user").order_by("-date")
 
         # Trainer can view assigned client's sessions
+        role = self.request.membership.role
         client_id = self.request.query_params.get("client_id")
         if role == "trainer" and client_id:
             from apps.organizations.models import Membership

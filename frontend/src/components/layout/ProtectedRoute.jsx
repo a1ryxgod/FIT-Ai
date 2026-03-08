@@ -2,6 +2,18 @@ import { Navigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { useOrgStore } from '@/store/orgStore'
 
+export function RequireAdmin({ children }) {
+  const { isAdmin } = useOrgStore()
+  if (!isAdmin()) return <Navigate to="/" replace />
+  return children
+}
+
+export function RequireTrainer({ children }) {
+  const { isTrainer } = useOrgStore()
+  if (!isTrainer()) return <Navigate to="/" replace />
+  return children
+}
+
 export function RequireAuth({ children }) {
   const accessToken = useAuthStore((s) => s.accessToken)
   const location = useLocation()

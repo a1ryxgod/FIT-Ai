@@ -81,6 +81,11 @@ api.interceptors.response.use(
       }
     }
 
+    if (error.response?.status === 403) {
+      const msg = error.response?.data?.detail || 'У вас немає доступу до цієї дії'
+      import('react-hot-toast').then(({ default: toast }) => toast.error(msg))
+    }
+
     if (import.meta.env.DEV) {
       console.debug('[API] Error', error.response?.status, error.response?.data)
     }

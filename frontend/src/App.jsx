@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Suspense, lazy, useEffect } from 'react'
 import { PageLoader } from '@/components/ui/Spinner'
-import { RequireAuth, RequireOrg, GuestOnly } from '@/components/layout/ProtectedRoute'
+import { RequireAuth, RequireOrg, GuestOnly, RequireAdmin, RequireTrainer } from '@/components/layout/ProtectedRoute'
 import PWAInstallBanner from '@/components/ui/PWAInstallBanner'
 import { useThemeStore } from '@/store/themeStore'
 import { useOrgStore } from '@/store/orgStore'
@@ -66,12 +66,12 @@ export default function App() {
           <Route path="/workouts/session"   element={<RequireOrg><Session /></RequireOrg>} />
           <Route path="/workouts/history"   element={<RequireOrg><WorkoutHistory /></RequireOrg>} />
           <Route path="/workouts/program/:id" element={<RequireOrg><ProgramDetail /></RequireOrg>} />
-          <Route path="/trainer"              element={<RequireOrg><Trainer /></RequireOrg>} />
-          <Route path="/trainer/client/:id"   element={<RequireOrg><ClientDetail /></RequireOrg>} />
+          <Route path="/trainer"              element={<RequireOrg><RequireTrainer><Trainer /></RequireTrainer></RequireOrg>} />
+          <Route path="/trainer/client/:id"   element={<RequireOrg><RequireTrainer><ClientDetail /></RequireTrainer></RequireOrg>} />
           <Route path="/nutrition"          element={<RequireOrg><Nutrition /></RequireOrg>} />
           <Route path="/progress"           element={<RequireOrg><Progress /></RequireOrg>} />
           <Route path="/ai"                 element={<RequireOrg><AIChat /></RequireOrg>} />
-          <Route path="/members"            element={<RequireOrg><Members /></RequireOrg>} />
+          <Route path="/members"            element={<RequireOrg><RequireAdmin><Members /></RequireAdmin></RequireOrg>} />
 
           {/* 404 */}
           <Route path="*" element={<NotFound />} />
