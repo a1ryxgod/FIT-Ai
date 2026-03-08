@@ -6,6 +6,8 @@ import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Modal from '@/components/ui/Modal'
 import Badge from '@/components/ui/Badge'
+import Select from '@/components/ui/Select'
+import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import { useAuthStore } from '@/store/authStore'
 import { useOrgStore } from '@/store/orgStore'
 import { useThemeStore } from '@/store/themeStore'
@@ -13,6 +15,7 @@ import { useSwitchOrg } from '@/hooks/useOrg'
 import { useProfile } from '@/hooks/useAuth'
 import { authApi } from '@/api/auth'
 import toast from 'react-hot-toast'
+import { Ruler, Flame, Calculator, Building2, LogOut, Activity } from '../../utils/icons'
 
 const ACTIVITY_LABELS = {
   sedentary: 'Малорухливий',
@@ -41,6 +44,7 @@ export default function Profile() {
     fat_goal: 70,
   })
   const [showOrgModal, setShowOrgModal] = useState(false)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
 
   useEffect(() => {
     authApi.getProfile().then(({ data }) => {
@@ -114,8 +118,10 @@ export default function Profile() {
     <Layout title="Профіль">
       {/* User header */}
       <div className="flex items-center gap-4 mb-6">
-        <div className="w-16 h-16 bg-brand-500/20 border-2 border-brand-500/40 rounded-full flex items-center justify-center text-2xl font-bold text-brand-400">
-          {user?.username?.[0]?.toUpperCase() ?? '?'}
+        <div className="p-0.5 rounded-full" style={{ background: 'linear-gradient(135deg, rgb(var(--brand-500)), rgb(var(--brand-400)))' }}>
+          <div className="w-16 h-16 bg-surface-800 rounded-full flex items-center justify-center text-2xl font-bold text-brand-400">
+            {user?.username?.[0]?.toUpperCase() ?? '?'}
+          </div>
         </div>
         <div>
           <h2 className="text-h2">{user?.username}</h2>
@@ -142,7 +148,7 @@ export default function Profile() {
 
       {/* Body stats form */}
       <Card className="mb-4">
-        <CardHeader title="Параметри тіла" subtitle="Використовується для розрахунку харчування" />
+        <CardHeader title="Параметри тіла" icon={Ruler} subtitle="Використовується для розрахунку харчування" />
         <form onSubmit={handleSave} className="space-y-4">
           <div className="grid grid-cols-3 gap-3">
             <Input
@@ -174,19 +180,13 @@ export default function Profile() {
               hint="р."
             />
           </div>
-          <div>
-            <label className="label">Рівень активності</label>
-            <select
-              name="activity_level"
-              className="input"
-              value={profileForm.activity_level}
-              onChange={onChange}
-            >
-              {Object.entries(ACTIVITY_LABELS).map(([val, label]) => (
-                <option key={val} value={val}>{label}</option>
-              ))}
-            </select>
-          </div>
+          <Select
+            label="Рівень активності"
+            value={profileForm.activity_level}
+            onChange={(v) => setProfileForm((p) => ({ ...p, activity_level: v }))}
+            options={Object.entries(ACTIVITY_LABELS).map(([value, label]) => ({ value, label }))}
+            icon={Activity}
+          />
           <Button type="submit" loading={savingProfile} fullWidth>
             Зберегти профіль
           </Button>
@@ -197,13 +197,15 @@ export default function Profile() {
       <Card className="mb-4">
         <CardHeader
           title="Цілі харчування"
+          icon={Flame}
           subtitle="Денні цілі для відстеження"
           action={
             <button
               type="button"
               onClick={calcTDEE}
-              className="text-[11px] font-semibold px-3 py-1.5 rounded-lg border border-brand-500/30 text-brand-400 transition-colors hover:bg-brand-500/10"
+              className="flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1.5 rounded-lg border border-brand-500/30 text-brand-400 transition-colors hover:bg-brand-500/10"
             >
+              <Calculator className="h-3 w-3" />
               Авторозрахунок
             </button>
           }
@@ -251,6 +253,7 @@ export default function Profile() {
       <Card className="mb-4">
         <CardHeader
           title="Організація"
+          icon={Building2}
           action={
             <Button size="sm" variant="secondary" onClick={() => setShowOrgModal(true)}>
               Змінити
@@ -287,11 +290,22 @@ export default function Profile() {
 
       {/* Logout */}
       <button
-        onClick={handleLogout}
-        className="btn-danger w-full"
+        onClick={() => setShowLogoutConfirm(true)}
+        className="btn-danger w-full flex items-center justify-center gap-2"
       >
+        <LogOut className="h-4 w-4" />
         Вийти
       </button>
+
+      <ConfirmDialog
+        isOpen={showLogoutConfirm}
+        onClose={() => setShowLogoutConfirm(false)}
+        onConfirm={handleLogout}
+        title="Вийти з акаунту?"
+        description="Ви будете перенаправлені на сторінку входу."
+        confirmLabel="Вийти"
+        variant="danger"
+      />
 
       {/* Org switch modal */}
       <Modal isOpen={showOrgModal} onClose={() => setShowOrgModal(false)} title="Змінити організацію">

@@ -5,11 +5,13 @@ import {
   ArcElement, Tooltip, Legend, Filler,
 } from 'chart.js'
 import { Link } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import Layout from '@/components/layout/Layout'
 import Card, { CardHeader } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import { SkeletonStatRow, SkeletonCard } from '@/components/ui/Skeleton'
 import OwnerDashboard from '@/components/dashboard/OwnerDashboard'
+import RingProgress, { MiniRing } from '@/components/ui/RingProgress'
 import { useTodaySummary } from '@/hooks/useNutrition'
 import { useWeightHistory } from '@/hooks/useProgress'
 import { useWorkoutHistory, usePersonalRecords } from '@/hooks/useWorkouts'
@@ -17,11 +19,13 @@ import { useProfileData } from '@/hooks/useAuth'
 import { useOrgStore } from '@/store/orgStore'
 import { useAuthStore } from '@/store/authStore'
 import { round1, macroPercent, formatDate } from '@/utils/helpers'
+import { Flame, Trophy, Dumbbell, TrendingUp, Play, Calendar } from '../../utils/icons'
+import { staggerContainer, staggerItem } from '../../utils/animations'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Tooltip, Legend, Filler)
 
-const CHART_GRID  = { color: 'rgba(63,63,72,0.8)' }
-const CHART_TICKS = { color: '#52525e', font: { size: 11, family: 'Inter' } }
+const CHART_GRID    = { color: 'rgba(63,63,72,0.8)' }
+const CHART_TICKS   = { color: '#52525e', font: { size: 11, family: 'Inter' } }
 const TOOLTIP_STYLE = { backgroundColor: '#1c1c22', borderColor: '#3f3f48', borderWidth: 1, titleColor: '#94a3b8', bodyColor: '#f1f5f9' }
 
 export default function Dashboard() {
@@ -37,14 +41,12 @@ export default function Dashboard() {
   const weightLogs = weightData?.results ?? []
   const sessions   = workoutData?.results ?? []
 
-  // Weekly workout count
   const weekStart = new Date()
   weekStart.setDate(weekStart.getDate() - weekStart.getDay())
   weekStart.setHours(0, 0, 0, 0)
   const weeklyCount = sessions.filter((s) => new Date(s.date) >= weekStart).length
   const WEEKLY_GOAL = 5
 
-  // Latest PR
   const latestPR = prs.length > 0
     ? [...prs].sort((a, b) => new Date(b.date) - new Date(a.date))[0]
     : null
@@ -54,7 +56,7 @@ export default function Dashboard() {
     datasets: [{
       data: [...weightLogs].reverse().map((w) => w.weight),
       borderColor: 'rgb(var(--brand-500))',
-      backgroundColor: 'rgba(var(--brand-500), 0.08)',
+      backgroundColor: 'rgba(var(--brand-500), 0.12)',
       fill: true, tension: 0.4,
       pointRadius: 3, pointBackgroundColor: 'rgb(var(--brand-500))',
       pointHoverRadius: 5,
@@ -72,56 +74,63 @@ export default function Dashboard() {
   }
 
   const calorieGoal = profile?.calorie_goal ?? 2000
-  const caloriePct  = Math.min(100, Math.round(((totals.calories ?? 0) / calorieGoal) * 100))
+  const proteinGoal = profile?.protein_goal ?? 150
+  const carbsGoal   = profile?.carbs_goal   ?? 200
+  const fatsGoal    = profile?.fats_goal    ?? 65
 
   return (
     <Layout title="Головна">
       {/* Greeting */}
-      <div className="mb-6">
+      <motion.div
+        className="mb-6"
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
         <p className="text-caption text-slate-500 uppercase tracking-wide">{getGreeting()}</p>
         <h2 className="text-h2 mt-0.5">{user?.username ?? 'Атлет'}</h2>
         {currentOrg && <p className="text-caption text-slate-500 mt-1">{currentOrg.name}</p>}
-      </div>
+      </motion.div>
 
-      {/* Owner / Admin gym overview */}
+      {/* Owner / Admin overview */}
       {(isOwner() || isAdmin()) && <OwnerDashboard />}
 
-      {/* Today's nutrition */}
+      {/* Today's nutrition — RingProgress */}
       <div className="mb-6">
         <p className="section-title">Харчування сьогодні</p>
         {loadingToday ? <SkeletonStatRow /> : (
           <Card className="mb-3">
-            <div className="flex items-center justify-between mb-3">
-              <div>
-                <p className="text-caption text-slate-500">Калорії</p>
-                <p className="text-h2 font-bold text-white">
-                  {round1(totals.calories ?? 0)}
-                  <span className="text-small text-slate-500 font-normal ml-1">/ {calorieGoal} ккал</span>
-                </p>
+            <div className="flex flex-col sm:flex-row items-center gap-6">
+              {/* Calorie Ring */}
+              <div className="flex-shrink-0">
+                <RingProgress
+                  value={totals.calories ?? 0}
+                  max={calorieGoal}
+                  size={130}
+                  strokeWidth={11}
+                  color="brand"
+                  label={round1(totals.calories ?? 0)}
+                  sublabel="ккал"
+                />
               </div>
-              <Link to="/nutrition">
-                <Button size="sm" variant="secondary">Додати їжу</Button>
-              </Link>
-            </div>
-            <div className="progress-track">
-              <div
-                className="progress-fill"
-                style={{ width: `${caloriePct}%`, background: 'rgb(var(--brand-500))' }}
-              />
-            </div>
-            <div className="grid grid-cols-3 gap-3 mt-3">
-              {[
-                { label: 'Білки',     value: round1(totals.protein ?? 0), unit: 'г', color: 'text-emerald-400' },
-                { label: 'Вуглеводи', value: round1(totals.carbs   ?? 0), unit: 'г', color: 'text-amber-400'   },
-                { label: 'Жири',      value: round1(totals.fats    ?? 0), unit: 'г', color: 'text-blue-400'    },
-              ].map(({ label, value, unit, color }) => (
-                <div key={label} className="text-center bg-surface-750 rounded-xl py-2">
-                  <p className={`font-bold text-base ${color}`}>
-                    {value}<span className="text-caption font-normal text-slate-500 ml-0.5">{unit}</span>
-                  </p>
-                  <p className="text-caption text-slate-500">{label}</p>
+
+              {/* Macro mini rings + button */}
+              <div className="flex-1 w-full">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <p className="text-caption text-slate-500">Ціль</p>
+                    <p className="text-small font-semibold text-slate-300">{calorieGoal} ккал</p>
+                  </div>
+                  <Link to="/nutrition">
+                    <Button size="sm" variant="secondary" icon={Flame}>Додати їжу</Button>
+                  </Link>
                 </div>
-              ))}
+                <div className="flex justify-around">
+                  <MiniRing value={round1(totals.protein ?? 0)} max={proteinGoal} color="brand"  label="Білки"     unit="г" />
+                  <MiniRing value={round1(totals.carbs   ?? 0)} max={carbsGoal}   color="amber"  label="Вуглеводи" unit="г" />
+                  <MiniRing value={round1(totals.fats    ?? 0)} max={fatsGoal}    color="blue"   label="Жири"      unit="г" />
+                </div>
+              </div>
             </div>
           </Card>
         )}
@@ -133,6 +142,7 @@ export default function Dashboard() {
           <CardHeader
             title="Динаміка ваги"
             subtitle="Останні 14 записів"
+            icon={TrendingUp}
             action={<Link to="/progress"><Button size="sm" variant="ghost">Всі</Button></Link>}
           />
           {loadingWeight ? (
@@ -194,13 +204,18 @@ export default function Dashboard() {
       <div className="mb-6">
         <Card className="border-brand-500/20 bg-brand-500/5">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="font-bold text-base text-white">Тренування сьогодні</p>
-              <p className="text-small text-slate-400 mt-0.5">
-                {sessions.length > 0 ? `${sessions[0]?.sets?.length ?? 0} підходів внесено` : 'Сесію ще не розпочато'}
-              </p>
+            <div className="flex items-center gap-3">
+              <div className="icon-container-md">
+                <Dumbbell className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="font-bold text-base text-white">Тренування сьогодні</p>
+                <p className="text-small text-slate-400 mt-0.5">
+                  {sessions.length > 0 ? `${sessions[0]?.sets?.length ?? 0} підходів внесено` : 'Сесію ще не розпочато'}
+                </p>
+              </div>
             </div>
-            <Link to="/workouts"><Button>Розпочати</Button></Link>
+            <Link to="/workouts"><Button icon={Play} variant="gradient">Розпочати</Button></Link>
           </div>
         </Card>
       </div>
@@ -208,28 +223,40 @@ export default function Dashboard() {
       {/* Weekly Activity + Latest PR */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         <Card>
-          <p className="text-caption text-slate-500 mb-1">Цього тижня</p>
-          <div className="flex items-end gap-1 mb-2">
+          <div className="flex items-center gap-2 mb-3">
+            <Flame className="h-4 w-4 text-orange-400" />
+            <p className="text-caption text-slate-500">Цього тижня</p>
+          </div>
+          <div className="flex items-end gap-1 mb-3">
             <span className="text-h2 font-bold text-white">{weeklyCount}</span>
             <span className="text-small text-slate-500 mb-0.5">/ {WEEKLY_GOAL} тренувань</span>
           </div>
-          <div className="flex gap-1">
+          <div className="flex gap-1.5">
             {Array.from({ length: WEEKLY_GOAL }).map((_, i) => (
-              <div
+              <motion.div
                 key={i}
                 className="flex-1 h-2 rounded-full"
-                style={{ background: i < weeklyCount ? 'rgb(var(--brand-500))' : 'rgba(255,255,255,0.07)' }}
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ delay: i * 0.05, duration: 0.3 }}
+                style={{
+                  background: i < weeklyCount ? 'rgb(var(--brand-500))' : 'rgba(255,255,255,0.07)',
+                  transformOrigin: 'left',
+                }}
               />
             ))}
           </div>
         </Card>
 
         <Card>
-          <p className="text-caption text-slate-500 mb-1">Останній рекорд</p>
+          <div className="flex items-center gap-2 mb-2">
+            <Trophy className="h-4 w-4 text-amber-400" />
+            <p className="text-caption text-slate-500">Останній рекорд</p>
+          </div>
           {latestPR ? (
             <>
               <p className="font-bold text-white text-sm truncate">{latestPR.exercise_name}</p>
-              <p className="text-small text-slate-400">{latestPR.best_weight} кг × {latestPR.best_reps} повт.</p>
+              <p className="text-small text-slate-400 mt-0.5">{latestPR.best_weight} кг × {latestPR.best_reps} повт.</p>
               <p className="text-caption text-brand-400 mt-0.5">1RM ≈ {latestPR.estimated_1rm} кг</p>
             </>
           ) : (
@@ -251,19 +278,33 @@ export default function Dashboard() {
             <p className="text-small text-slate-500">Тренувань ще немає</p>
           </Card>
         ) : (
-          <div className="space-y-2">
+          <motion.div
+            className="space-y-2"
+            variants={staggerContainer}
+            initial="initial"
+            animate="animate"
+          >
             {sessions.slice(0, 3).map((s) => (
-              <div key={s.id} className="flex items-center justify-between p-3 bg-surface-800 rounded-xl border border-surface-700/60">
-                <div>
-                  <p className="text-small font-medium text-slate-200">{formatDate(s.date)}</p>
-                  <p className="text-caption text-slate-500">{s.sets?.length ?? 0} підходів</p>
+              <motion.div
+                key={s.id}
+                variants={staggerItem}
+                className="flex items-center justify-between p-3 bg-surface-800 rounded-xl border border-surface-700/60"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-surface-700 rounded-lg flex items-center justify-center">
+                    <Calendar className="h-4 w-4 text-slate-500" />
+                  </div>
+                  <div>
+                    <p className="text-small font-medium text-slate-200">{formatDate(s.date)}</p>
+                    <p className="text-caption text-slate-500">{s.sets?.length ?? 0} підходів</p>
+                  </div>
                 </div>
                 <span className={`badge ${s.is_active ? 'bg-success/15 text-success' : 'bg-surface-700 text-slate-500'}`}>
                   {s.is_active ? 'Активна' : 'Завершена'}
                 </span>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         )}
       </div>
     </Layout>

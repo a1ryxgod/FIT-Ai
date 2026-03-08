@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import { useRegister } from '@/hooks/useAuth'
+import { User, Mail, Lock, Building2 } from '../../utils/icons'
 
 export default function Register() {
   const [form, setForm] = useState({
@@ -53,11 +55,18 @@ export default function Register() {
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full opacity-20"
           style={{ background: 'radial-gradient(circle, rgb(var(--brand-500)) 0%, transparent 70%)' }} />
+        <div className="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] rounded-full opacity-10"
+          style={{ background: 'radial-gradient(circle, rgb(var(--brand-400)) 0%, transparent 70%)' }} />
       </div>
-      <div className="w-full max-w-md relative z-10">
+      <motion.div
+        className="w-full max-w-md relative z-10"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: 'easeOut' }}
+      >
         <div className="text-center mb-8">
           <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center text-lg font-black text-white tracking-tight"
-            style={{ background: 'rgb(var(--brand-500))' }}>
+            style={{ background: 'linear-gradient(135deg, rgb(var(--brand-600)), rgb(var(--brand-400)))' }}>
             FT
           </div>
           <h1 className="text-h1 text-white">Створити акаунт</h1>
@@ -74,6 +83,7 @@ export default function Register() {
                 onChange={onChange}
                 error={errors.username}
                 placeholder="john_doe"
+                icon={User}
                 required
                 autoFocus
               />
@@ -85,6 +95,7 @@ export default function Register() {
                 onChange={onChange}
                 error={errors.email}
                 placeholder="john@example.com"
+                icon={Mail}
                 required
               />
             </div>
@@ -95,6 +106,7 @@ export default function Register() {
               onChange={onChange}
               error={errors.organization_name}
               placeholder="Мій зал"
+              icon={Building2}
               required
               hint="Учасників можна запросити пізніше"
             />
@@ -106,6 +118,7 @@ export default function Register() {
               onChange={onChange}
               error={errors.password}
               placeholder="Мін. 8 символів"
+              icon={Lock}
               required
             />
             <Input
@@ -116,9 +129,10 @@ export default function Register() {
               onChange={onChange}
               error={errors.password2}
               placeholder="Повторіть пароль"
+              icon={Lock}
               required
             />
-            <Button type="submit" fullWidth loading={loading} size="lg">
+            <Button type="submit" fullWidth loading={loading} size="lg" variant="gradient">
               Створити акаунт
             </Button>
           </form>
@@ -130,7 +144,7 @@ export default function Register() {
             </Link>
           </p>
         </div>
-      </div>
+      </motion.div>
     </div>
   )
 }

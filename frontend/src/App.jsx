@@ -7,6 +7,7 @@ import { useThemeStore } from '@/store/themeStore'
 import { useOrgStore } from '@/store/orgStore'
 import { settingsApi } from '@/api/settings'
 import { useAuthStore } from '@/store/authStore'
+import { Dumbbell } from '@/utils/icons'
 
 // Lazy pages (code splitting)
 const Login          = lazy(() => import('@/pages/Auth/Login'))
@@ -78,7 +79,9 @@ export default function App() {
 function NotFound() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center text-center px-4">
-      <div className="text-6xl mb-4">🏋️</div>
+      <div className="w-16 h-16 mb-4 mx-auto rounded-2xl flex items-center justify-center" style={{ background: 'rgba(var(--brand-500),0.15)' }}>
+        <Dumbbell className="h-8 w-8 text-brand-400" />
+      </div>
       <h1 className="text-h1 text-brand-500 mb-2">404</h1>
       <p className="text-slate-400 mb-6 text-small">Page not found</p>
       <a href="/" className="btn-primary inline-block">Go home</a>

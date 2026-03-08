@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { motion } from 'framer-motion'
 import Layout from '@/components/layout/Layout'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
@@ -9,6 +10,7 @@ import EmptyState from '@/components/ui/EmptyState'
 import { usePrograms, useCreateProgram, useStartSession } from '@/hooks/useWorkouts'
 import { useNavigate } from 'react-router-dom'
 import { formatDate } from '@/utils/helpers'
+import { Play, Plus, FolderOpen, Dumbbell } from '../../utils/icons'
 
 export default function Workouts() {
   const navigate = useNavigate()
@@ -47,28 +49,29 @@ export default function Workouts() {
       </div>
 
       {/* Quick Start — prominent CTA */}
-      <div
-        className="rounded-2xl p-5 mb-6 relative overflow-hidden cursor-pointer group"
-        style={{ background: 'linear-gradient(135deg, rgb(var(--brand-600)), rgb(var(--brand-500)))' }}
+      <motion.div
+        whileTap={{ scale: 0.99 }}
+        whileHover={{ scale: 1.005 }}
+        transition={{ duration: 0.15 }}
+        className="rounded-2xl p-5 mb-6 relative overflow-hidden cursor-pointer"
+        style={{ background: 'linear-gradient(135deg, rgb(var(--brand-700)), rgb(var(--brand-500)))' }}
         onClick={handleQuickStart}
       >
-        <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors" />
         <div className="relative flex items-center justify-between">
           <div>
-            <p className="text-white/70 text-caption uppercase tracking-wide">Вільна сесія</p>
+            <p className="text-white/60 text-caption uppercase tracking-wide">Вільна сесія</p>
             <p className="text-white font-bold text-h2 mt-0.5">Швидкий старт</p>
-            <p className="text-white/60 text-small mt-1">Розпочати без програми</p>
+            <p className="text-white/50 text-small mt-1">Розпочати без програми</p>
           </div>
-          <div className="w-14 h-14 bg-white/15 rounded-2xl flex items-center justify-center">
-            <span className="text-white font-black text-xl tracking-tight">GO</span>
-          </div>
+          <motion.div
+            animate={startLoading ? { rotate: 360 } : { rotate: 0 }}
+            transition={startLoading ? { duration: 1, repeat: Infinity, ease: 'linear' } : {}}
+            className="w-14 h-14 bg-white/15 rounded-2xl flex items-center justify-center"
+          >
+            <Play className="h-6 w-6 text-white ml-0.5" />
+          </motion.div>
         </div>
-        {startLoading && (
-          <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-            <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
-          </div>
-        )}
-      </div>
+      </motion.div>
 
       {/* Programs */}
       <p className="section-title">Мої програми</p>
@@ -76,6 +79,7 @@ export default function Workouts() {
         <SkeletonList count={3} />
       ) : programs.length === 0 ? (
         <EmptyState
+          icon={Dumbbell}
           title="Програм ще немає"
           description="Створіть програму для структурування тренувань"
           action="Створити програму"
@@ -118,15 +122,15 @@ function ProgramCard({ program, onStart, loading }) {
   return (
     <Card className="flex items-center justify-between gap-3">
       <div className="flex items-center gap-3 min-w-0">
-        <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 text-[11px] font-black text-brand-400 tracking-tight" style={{ background: 'rgba(var(--brand-500),0.1)', border: '1px solid rgba(var(--brand-500),0.15)' }}>
-          {program.name?.[0]?.toUpperCase()}
+        <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(var(--brand-500),0.1)', border: '1px solid rgba(var(--brand-500),0.15)' }}>
+          <FolderOpen className="h-5 w-5 text-brand-400" />
         </div>
         <div className="min-w-0">
           <p className="font-semibold text-slate-100 text-small truncate">{program.name}</p>
           <p className="text-caption text-slate-500">Створено {formatDate(program.created_at)}</p>
         </div>
       </div>
-      <Button size="sm" onClick={onStart} loading={loading} className="flex-shrink-0">
+      <Button size="sm" icon={Play} onClick={onStart} loading={loading} className="flex-shrink-0">
         Розпочати
       </Button>
     </Card>

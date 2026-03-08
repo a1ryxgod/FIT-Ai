@@ -4,17 +4,23 @@ import Card, { CardHeader } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Badge from '@/components/ui/Badge'
+import Select from '@/components/ui/Select'
 import { useOrgStore } from '@/store/orgStore'
 import { useMembers, useInviteMember } from '@/hooks/useMembers'
+import { Users, UserPlus, User } from '../../utils/icons'
+
+const ROLE_OPTIONS = [
+  { value: 'member',  label: 'Учасник' },
+  { value: 'trainer', label: 'Тренер' },
+  { value: 'admin',   label: 'Адмін' },
+]
 
 function MemberRow({ member }) {
-  const initial = member.username?.[0]?.toUpperCase() ?? '?'
-
   return (
     <div className="flex items-center gap-3 py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-      <div className="w-9 h-9 rounded-xl flex items-center justify-center text-small font-black text-brand-400 shrink-0"
+      <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
         style={{ background: 'rgba(var(--brand-500),0.12)' }}>
-        {initial}
+        <User className="h-4 w-4 text-brand-400" />
       </div>
       <div className="flex-1 min-w-0">
         <p className="font-semibold text-slate-100 text-small truncate">{member.username}</p>
@@ -46,6 +52,7 @@ export default function Members() {
       <Card className="mb-4">
         <CardHeader
           title="Учасники команди"
+          icon={Users}
           subtitle={isLoading ? 'Завантаження…' : `${members.length} учасник${members.length !== 1 ? 'ів' : ''}`}
         />
         {isLoading ? (
@@ -70,17 +77,16 @@ export default function Members() {
             value={form.username}
             onChange={onChange}
             placeholder="john_doe"
+            icon={User}
             required
           />
-          <div>
-            <label className="label">Роль</label>
-            <select name="role" className="input" value={form.role} onChange={onChange}>
-              <option value="member">Учасник</option>
-              <option value="trainer">Тренер</option>
-              <option value="admin">Адмін</option>
-            </select>
-          </div>
-          <Button type="submit" loading={inviting} fullWidth>
+          <Select
+            label="Роль"
+            value={form.role}
+            onChange={(v) => setForm((p) => ({ ...p, role: v }))}
+            options={ROLE_OPTIONS}
+          />
+          <Button type="submit" icon={UserPlus} loading={inviting} fullWidth>
             Надіслати запрошення
           </Button>
         </form>

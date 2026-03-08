@@ -4,10 +4,12 @@ import Card, { CardHeader } from '@/components/ui/Card'
 import Spinner from '@/components/ui/Spinner'
 import EmptyState from '@/components/ui/EmptyState'
 import Button from '@/components/ui/Button'
+import Toggle from '@/components/ui/Toggle'
 import { useWorkoutHistory } from '@/hooks/useWorkouts'
 import { formatDate } from '@/utils/helpers'
 import { useNavigate } from 'react-router-dom'
 import { useOrgStore } from '@/store/orgStore'
+import { BarChart3, ChevronLeft, ChevronRight, Calendar, Dumbbell } from '../../utils/icons'
 
 export default function WorkoutHistory() {
   const navigate = useNavigate()
@@ -27,17 +29,12 @@ export default function WorkoutHistory() {
         <h2 className="text-lg font-semibold text-slate-100">Історія</h2>
         <div className="flex items-center gap-2">
           {admin && (
-            <button
-              onClick={() => { setShowAll((v) => !v); setPage(1) }}
-              className={`text-[11px] font-semibold px-3 py-1.5 rounded-lg transition-colors ${
-                showAll
-                  ? 'text-brand-400 border border-brand-500/30'
-                  : 'text-slate-500 border border-transparent hover:text-slate-300'
-              }`}
-              style={showAll ? { background: 'rgba(var(--brand-500),0.1)' } : {}}
-            >
-              {showAll ? 'Всі учасники' : 'Моя історія'}
-            </button>
+            <Toggle
+              checked={showAll}
+              onChange={(v) => { setShowAll(v); setPage(1) }}
+              labelLeft="Моя"
+              labelRight="Всі"
+            />
           )}
           <Button onClick={() => navigate('/workouts')} variant="secondary" size="sm">
             Назад
@@ -49,7 +46,7 @@ export default function WorkoutHistory() {
         <div className="flex justify-center py-12"><Spinner /></div>
       ) : sessions.length === 0 ? (
         <EmptyState
-          icon="📊"
+          icon={BarChart3}
           title="Історія тренувань порожня"
           description="Завершіть перше тренування, щоб побачити його тут"
           action="Розпочати тренування"
@@ -94,6 +91,7 @@ export default function WorkoutHistory() {
               <Button
                 variant="secondary"
                 size="sm"
+                icon={ChevronLeft}
                 disabled={page === 1}
                 onClick={() => setPage((p) => p - 1)}
               >
@@ -105,6 +103,7 @@ export default function WorkoutHistory() {
               <Button
                 variant="secondary"
                 size="sm"
+                iconRight={ChevronRight}
                 disabled={page >= totalPages}
                 onClick={() => setPage((p) => p + 1)}
               >

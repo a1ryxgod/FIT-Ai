@@ -4,16 +4,20 @@ import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Modal from '@/components/ui/Modal'
+import SearchInput from '@/components/ui/SearchInput'
+import Tabs from '@/components/ui/Tabs'
+import RingProgress, { MiniRing } from '@/components/ui/RingProgress'
 import { SkeletonStatRow, SkeletonList } from '@/components/ui/Skeleton'
 import { useTodaySummary, useFoodProducts, useLogFood } from '@/hooks/useNutrition'
 import { useProfileData } from '@/hooks/useAuth'
 import { round1 } from '@/utils/helpers'
+import { Coffee, Sun, Moon, Cookie, Plus } from '../../utils/icons'
 
 const MEAL_TYPES = [
-  { key: 'breakfast', label: 'Сніданок', abbr: 'AM' },
-  { key: 'lunch',     label: 'Обід',     abbr: '12' },
-  { key: 'dinner',    label: 'Вечеря',   abbr: 'PM' },
-  { key: 'snack',     label: 'Перекус',  abbr: '+' },
+  { key: 'breakfast', label: 'Сніданок', icon: Coffee },
+  { key: 'lunch',     label: 'Обід',     icon: Sun    },
+  { key: 'dinner',    label: 'Вечеря',   icon: Moon   },
+  { key: 'snack',     label: 'Перекус',  icon: Cookie },
 ]
 
 export default function Nutrition() {
@@ -48,53 +52,54 @@ export default function Nutrition() {
       <div className="mb-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-h2">Сьогодні</h2>
-          <Button onClick={() => setShowLogModal(true)} size="sm">+ Додати їжу</Button>
+          <Button onClick={() => setShowLogModal(true)} size="sm" icon={Plus}>Додати їжу</Button>
         </div>
 
         {loadingToday ? <SkeletonStatRow /> : (
-          <>
-            {/* Hero calorie card */}
-            <Card className="mb-4">
-              <div className="text-center mb-3">
-                <p className="text-caption text-slate-500">Спожито калорій</p>
-                <div className="flex items-end justify-center gap-1 mt-1">
-                  <span className="text-[40px] font-bold text-white leading-none">{Math.round(totals.calories ?? 0)}</span>
-                  <span className="text-small text-slate-500 mb-1">/ {MACRO_GOALS.calories} ккал</span>
-                </div>
-              </div>
-              <div className="progress-track h-3 mb-4">
-                <div
-                  className="progress-fill h-3 rounded-full"
-                  style={{
-                    width: `${Math.min(100, Math.round(((totals.calories ?? 0) / MACRO_GOALS.calories) * 100))}%`,
-                    background: 'linear-gradient(90deg, rgb(var(--brand-500)), rgb(var(--brand-400)))',
-                  }}
+          <Card className="mb-4">
+            {/* RingProgress + Macro mini rings */}
+            <div className="flex flex-col sm:flex-row items-center gap-6">
+              {/* Calorie Ring */}
+              <div className="flex-shrink-0">
+                <RingProgress
+                  value={totals.calories ?? 0}
+                  max={MACRO_GOALS.calories}
+                  size={150}
+                  strokeWidth={12}
+                  color="brand"
+                  label={Math.round(totals.calories ?? 0)}
+                  sublabel={`/ ${MACRO_GOALS.calories} ккал`}
                 />
               </div>
-              {/* Macro row */}
-              <div className="grid grid-cols-3 gap-3">
-                {[
-                  { label: 'Білки',     val: totals.protein ?? 0, goal: MACRO_GOALS.protein, color: 'bg-emerald-500', textColor: 'text-emerald-400' },
-                  { label: 'Вуглеводи', val: totals.carbs   ?? 0, goal: MACRO_GOALS.carbs,   color: 'bg-amber-500',   textColor: 'text-amber-400'   },
-                  { label: 'Жири',      val: totals.fats    ?? 0, goal: MACRO_GOALS.fats,    color: 'bg-blue-500',    textColor: 'text-blue-400'    },
-                ].map(({ label, val, goal, color, textColor }) => {
-                  const pct = Math.min(100, Math.round((val / goal) * 100))
-                  return (
-                    <div key={label} className="bg-surface-750 rounded-xl p-3">
-                      <p className={`text-base font-bold ${textColor}`}>
-                        {round1(val)}<span className="text-caption font-normal text-slate-500 ml-0.5">г</span>
-                      </p>
-                      <p className="text-caption text-slate-500 mb-1.5">{label}</p>
-                      <div className="progress-track h-1">
-                        <div className={`progress-fill h-1 ${color}`} style={{ width: `${pct}%` }} />
-                      </div>
-                      <p className="text-[10px] text-slate-600 mt-0.5">{pct}% від цілі</p>
-                    </div>
-                  )
-                })}
+
+              {/* Macro rings */}
+              <div className="flex-1 w-full">
+                <div className="flex justify-around">
+                  <MiniRing
+                    value={round1(totals.protein ?? 0)}
+                    max={MACRO_GOALS.protein}
+                    color="brand"
+                    label="Білки"
+                    unit="г"
+                  />
+                  <MiniRing
+                    value={round1(totals.carbs ?? 0)}
+                    max={MACRO_GOALS.carbs}
+                    color="amber"
+                    label="Вуглеводи"
+                    unit="г"
+                  />
+                  <MiniRing
+                    value={round1(totals.fats ?? 0)}
+                    max={MACRO_GOALS.fats}
+                    color="blue"
+                    label="Жири"
+                    unit="г"
+                  />
+                </div>
               </div>
-            </Card>
-          </>
+            </div>
+          </Card>
         )}
       </div>
 
@@ -105,7 +110,7 @@ export default function Nutrition() {
           <SkeletonList count={2} />
         ) : (
           <div className="space-y-3">
-            {MEAL_TYPES.map(({ key, label }) => {
+            {MEAL_TYPES.map(({ key, label, icon: MealIcon }) => {
               const mealLogs = byMeal[key] ?? []
               const mealCals = mealLogs.reduce((sum, l) => {
                 const factor = (l.grams ?? 100) / 100
@@ -115,7 +120,10 @@ export default function Nutrition() {
               return (
                 <Card key={key}>
                   <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2.5">
+                      <div className="icon-container-sm">
+                        <MealIcon className="h-3.5 w-3.5" />
+                      </div>
                       <div>
                         <p className="font-semibold text-slate-100 text-small">{label}</p>
                         {mealLogs.length > 0 && (
@@ -123,8 +131,8 @@ export default function Nutrition() {
                         )}
                       </div>
                     </div>
-                    <Button size="sm" variant="ghost" onClick={() => handleAddFood(key)}>
-                      + Додати
+                    <Button size="sm" variant="ghost" icon={Plus} onClick={() => handleAddFood(key)}>
+                      Додати
                     </Button>
                   </div>
 
@@ -181,6 +189,8 @@ function LogFoodModal({ isOpen, onClose, defaultMeal = 'lunch' }) {
   const { data: products = [], isLoading } = useFoodProducts(search)
   const logFood = useLogFood()
 
+  const mealTabs = MEAL_TYPES.map(({ key, label, icon }) => ({ id: key, label, icon }))
+
   const handleLog = async () => {
     if (!selectedProduct || !grams) return
     await logFood.mutateAsync({
@@ -197,30 +207,13 @@ function LogFoodModal({ isOpen, onClose, defaultMeal = 'lunch' }) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Додати їжу" size="lg">
       <div className="space-y-4">
-        {/* Meal selector */}
-        <div className="flex gap-2">
-          {MEAL_TYPES.map(({ key, abbr, label }) => (
-            <button
-              key={key}
-              type="button"
-              onClick={() => setMealType(key)}
-              className={`flex-1 flex flex-col items-center py-2.5 rounded-xl text-[10px] font-semibold tracking-wide transition-all ${
-                mealType === key
-                  ? 'text-brand-400 border border-brand-500/30'
-                  : 'text-slate-500 hover:text-slate-300'
-              }`}
-            style={mealType === key ? { background: 'rgba(var(--brand-500),0.12)' } : { background: 'rgba(255,255,255,0.04)' }}
-            >
-              <span className="text-[13px] font-black mb-0.5">{abbr}</span>
-              {label}
-            </button>
-          ))}
-        </div>
+        {/* Meal selector — Tabs */}
+        <Tabs tabs={mealTabs} activeTab={mealType} onChange={setMealType} />
 
-        <Input
-          label="Пошук їжі"
+        {/* Search */}
+        <SearchInput
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={setSearch}
           placeholder="Куряча грудка, вівсянка..."
           autoFocus
         />

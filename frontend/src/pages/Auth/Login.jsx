@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import { useLogin } from '@/hooks/useAuth'
+import { User, Lock } from '../../utils/icons'
 
 export default function Login() {
   const [form, setForm] = useState({ username: '', password: '' })
@@ -17,17 +19,24 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden" style={{ background: '#0F0F11' }}>
-      {/* Background glow */}
+      {/* Background glows */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full opacity-20"
           style={{ background: 'radial-gradient(circle, rgb(var(--brand-500)) 0%, transparent 70%)' }} />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] rounded-full opacity-10"
+          style={{ background: 'radial-gradient(circle, rgb(var(--brand-400)) 0%, transparent 70%)' }} />
       </div>
 
-      <div className="w-full max-w-sm relative z-10">
+      <motion.div
+        className="w-full max-w-sm relative z-10"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: 'easeOut' }}
+      >
         {/* Logo */}
         <div className="text-center mb-10">
           <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center text-lg font-black text-white tracking-tight"
-            style={{ background: 'rgb(var(--brand-500))' }}>
+            style={{ background: 'linear-gradient(135deg, rgb(var(--brand-600)), rgb(var(--brand-400)))' }}>
             FT
           </div>
           <h1 className="text-h1 text-white">FitTrack</h1>
@@ -42,6 +51,7 @@ export default function Login() {
               value={form.username}
               onChange={onChange}
               placeholder="your_username"
+              icon={User}
               required
               autoComplete="username"
               autoFocus
@@ -53,10 +63,11 @@ export default function Login() {
               value={form.password}
               onChange={onChange}
               placeholder="••••••••"
+              icon={Lock}
               required
               autoComplete="current-password"
             />
-            <Button type="submit" fullWidth loading={loading} size="lg" className="mt-2">
+            <Button type="submit" fullWidth loading={loading} size="lg" variant="gradient" className="mt-2">
               Увійти
             </Button>
           </form>
@@ -68,7 +79,7 @@ export default function Login() {
             </Link>
           </p>
         </div>
-      </div>
+      </motion.div>
     </div>
   )
 }

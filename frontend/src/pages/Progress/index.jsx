@@ -12,9 +12,14 @@ import Input from '@/components/ui/Input'
 import Modal from '@/components/ui/Modal'
 import Spinner from '@/components/ui/Spinner'
 import EmptyState from '@/components/ui/EmptyState'
+import Tabs from '@/components/ui/Tabs'
 import { useWeightHistory, useLogWeight } from '@/hooks/useProgress'
 import { usePersonalRecords } from '@/hooks/useWorkouts'
 import { formatDate, round1 } from '@/utils/helpers'
+import {
+  Scale, TrendingUp, TrendingDown, ArrowDown, ArrowUp,
+  Trophy, ChevronLeft, ChevronRight, Plus,
+} from '../../utils/icons'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend, Filler)
 
@@ -82,25 +87,36 @@ export default function Progress() {
     },
   }
 
+  const [activeTab, setActiveTab] = useState('weight')
+  const progressTabs = [
+    { id: 'weight', label: 'Вага', icon: Scale },
+    { id: 'prs',    label: 'Рекорди', icon: Trophy },
+  ]
+
   return (
     <Layout title="Прогрес">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-semibold text-slate-100">Відстеження ваги</h2>
-        <Button onClick={() => setShowModal(true)} size="sm">+ Внести вагу</Button>
+        <h2 className="text-lg font-semibold text-slate-100">Прогрес</h2>
+        <Button onClick={() => setShowModal(true)} size="sm" icon={Plus}>Внести вагу</Button>
       </div>
 
+      <Tabs tabs={progressTabs} activeTab={activeTab} onChange={setActiveTab} className="mb-6" />
+
+      {activeTab === 'weight' && (
+      <>
       {/* Stats Row */}
       {logs.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-          <StatCard label="Поточна" value={latest ?? '—'} unit="кг" color="brand" />
+          <StatCard label="Поточна" value={latest ?? '—'} unit="кг" color="brand" icon={Scale} />
           <StatCard
             label="Зміна"
             value={diff != null ? (diff > 0 ? `+${diff}` : diff) : '—'}
             unit={diff != null ? 'кг' : ''}
             color={diff == null ? 'brand' : diff <= 0 ? 'green' : 'red'}
+            icon={diff == null || diff <= 0 ? TrendingDown : TrendingUp}
           />
-          <StatCard label="Мін" value={min ?? '—'} unit={min != null ? 'кг' : ''} color="green" />
-          <StatCard label="Макс" value={max ?? '—'} unit={max != null ? 'кг' : ''} color="red" />
+          <StatCard label="Мін" value={min ?? '—'} unit={min != null ? 'кг' : ''} color="green" icon={ArrowDown} />
+          <StatCard label="Макс" value={max ?? '—'} unit={max != null ? 'кг' : ''} color="red"   icon={ArrowUp}   />
         </div>
       )}
 
@@ -109,6 +125,7 @@ export default function Progress() {
         <div className="flex justify-center py-12"><Spinner /></div>
       ) : logs.length === 0 ? (
         <EmptyState
+          icon={Scale}
           title="Записів ваги ще немає"
           description="Починайте відстежувати вагу, щоб бачити прогрес"
           action="Внести вагу"
@@ -117,7 +134,7 @@ export default function Progress() {
       ) : (
         <>
           <Card className="mb-6">
-            <CardHeader title="Динаміка ваги" subtitle={`${logs.length} записів`} />
+            <CardHeader title="Динаміка ваги" subtitle={`${logs.length} записів`} icon={TrendingUp} />
             <div className="h-64">
               <Line data={chartData} options={chartOptions} />
             </div>
@@ -127,72 +144,80 @@ export default function Progress() {
           <Card>
             <CardHeader title="Історія" />
             <div className="space-y-2">
-              {sortedDesc.map((log, i) => (
-                <div key={log.id} className="flex items-center justify-between py-2 border-b border-surface-700 last:border-0">
-                  <span className="text-sm text-slate-400">{formatDate(log.date)}</span>
-                  <div className="flex items-center gap-3">
-                    {i < sortedDesc.length - 1 && (
-                      <span className={`text-xs ${log.weight < sortedDesc[i + 1].weight ? 'text-emerald-400' : log.weight > sortedDesc[i + 1].weight ? 'text-red-400' : 'text-slate-500'}`}>
-                        {log.weight < sortedDesc[i + 1].weight ? '▼' : log.weight > sortedDesc[i + 1].weight ? '▲' : '—'}
-                        {' '}
-                        {Math.abs(round1(log.weight - sortedDesc[i + 1].weight))}
-                      </span>
-                    )}
-                    <span className="font-medium text-slate-200">{log.weight} кг</span>
+              {sortedDesc.map((log, i) => {
+                const prev = sortedDesc[i + 1]
+                const delta = prev ? round1(log.weight - prev.weight) : null
+                const up = delta > 0
+                const down = delta < 0
+                return (
+                  <div key={log.id} className="flex items-center justify-between py-2 border-b border-surface-700 last:border-0">
+                    <span className="text-sm text-slate-400">{formatDate(log.date)}</span>
+                    <div className="flex items-center gap-3">
+                      {delta !== null && (
+                        <span className={`flex items-center gap-0.5 text-xs ${down ? 'text-emerald-400' : up ? 'text-red-400' : 'text-slate-500'}`}>
+                          {down ? <TrendingDown className="h-3 w-3" /> : up ? <TrendingUp className="h-3 w-3" /> : null}
+                          {Math.abs(delta)}
+                        </span>
+                      )}
+                      <span className="font-medium text-slate-200">{log.weight} кг</span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
 
             {totalPages > 1 && (
               <div className="flex justify-center gap-2 mt-4">
-                <Button variant="secondary" size="sm" disabled={page === 1} onClick={() => setPage((p) => p - 1)}>
-                  Попередня
-                </Button>
+                <Button variant="secondary" size="sm" icon={ChevronLeft} disabled={page === 1} onClick={() => setPage((p) => p - 1)}>Попередня</Button>
                 <span className="flex items-center text-sm text-slate-400">{page} / {totalPages}</span>
-                <Button variant="secondary" size="sm" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
-                  Наступна
-                </Button>
+                <Button variant="secondary" size="sm" iconRight={ChevronRight} disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>Наступна</Button>
               </div>
             )}
           </Card>
         </>
       )}
+      </>
+      )}
 
-      {/* Personal Records */}
-      <div className="mt-6">
-        <h2 className="text-lg font-semibold text-slate-100 mb-4">Особисті рекорди</h2>
-        {prsLoading ? (
-          <div className="flex justify-center py-8"><Spinner /></div>
-        ) : prs.length === 0 ? (
-          <Card>
-            <p className="text-sm text-slate-500 text-center py-4">Тренувань ще немає. Завершіть тренування, щоб побачити рекорди.</p>
-          </Card>
-        ) : (
-          <Card>
-            <div className="space-y-0">
-              {prs.map((pr, i) => (
-                <div key={pr.exercise_id} className="flex items-center gap-3 py-3 border-b border-surface-700 last:border-0">
-                  <div className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black text-slate-400 shrink-0"
-                    style={{ background: 'rgba(255,255,255,0.05)' }}>
-                    {i === 0 ? '🏆' : `${i + 1}`}
+      {/* Personal Records Tab */}
+      {activeTab === 'prs' && (
+        <div>
+          {prsLoading ? (
+            <div className="flex justify-center py-8"><Spinner /></div>
+          ) : prs.length === 0 ? (
+            <EmptyState
+              icon={Trophy}
+              title="Рекордів ще немає"
+              description="Завершіть тренування, щоб побачити особисті рекорди"
+            />
+          ) : (
+            <Card>
+              <div className="space-y-0">
+                {prs.map((pr, i) => (
+                  <div key={pr.exercise_id} className="flex items-center gap-3 py-3 border-b border-surface-700 last:border-0">
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${i === 0 ? 'bg-amber-500/15' : 'bg-surface-700'}`}>
+                      {i === 0
+                        ? <Trophy className="h-4 w-4 text-amber-400" />
+                        : <span className="text-xs font-bold text-slate-500">{i + 1}</span>
+                      }
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-slate-100 text-sm truncate">{pr.exercise_name}</p>
+                      <p className={`text-xs capitalize ${MUSCLE_COLORS[pr.muscle_group] ?? 'text-slate-500'}`}>
+                        {pr.muscle_group ?? 'Інше'} · {formatDate(pr.date)}
+                      </p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="font-bold text-slate-100 text-sm">{pr.best_weight} кг × {pr.best_reps}</p>
+                      <p className="text-xs text-slate-500">1RM ≈ <span className="text-brand-400 font-semibold">{pr.estimated_1rm} кг</span></p>
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-slate-100 text-sm truncate">{pr.exercise_name}</p>
-                    <p className={`text-xs capitalize ${MUSCLE_COLORS[pr.muscle_group] ?? 'text-slate-500'}`}>
-                      {pr.muscle_group ?? 'Інше'} · {formatDate(pr.date)}
-                    </p>
-                  </div>
-                  <div className="text-right shrink-0">
-                    <p className="font-bold text-slate-100 text-sm">{pr.best_weight} кг × {pr.best_reps}</p>
-                    <p className="text-xs text-slate-500">1RM ≈ <span className="text-brand-400 font-semibold">{pr.estimated_1rm} кг</span></p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Card>
-        )}
-      </div>
+                ))}
+              </div>
+            </Card>
+          )}
+        </div>
+      )}
 
       <LogWeightModal isOpen={showModal} onClose={() => setShowModal(false)} />
     </Layout>

@@ -7,9 +7,12 @@ import Input from '@/components/ui/Input'
 import Modal from '@/components/ui/Modal'
 import Badge from '@/components/ui/Badge'
 import Spinner from '@/components/ui/Spinner'
+import Select from '@/components/ui/Select'
+import EmptyState from '@/components/ui/EmptyState'
 import { useOrgStore } from '@/store/orgStore'
 import { useSwitchOrg, useCreateOrg, useInviteUser } from '@/hooks/useOrg'
 import { orgsApi } from '@/api/organizations'
+import { Building2, Plus, UserPlus, Shield, User } from '../../utils/icons'
 
 export default function Organizations() {
   const navigate = useNavigate()
@@ -62,21 +65,19 @@ export default function Organizations() {
     <Layout title="Організації">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-semibold text-slate-100">Ваші організації</h2>
-        <Button onClick={() => setShowCreateModal(true)} size="sm">+ Створити</Button>
+        <Button onClick={() => setShowCreateModal(true)} size="sm" icon={Plus}>Створити</Button>
       </div>
 
       {loadingOrgs ? (
         <div className="flex justify-center py-12"><Spinner /></div>
       ) : organizations.length === 0 ? (
-        <Card>
-          <div className="flex flex-col items-center py-12 text-slate-500">
-            <span className="text-4xl mb-3">🏢</span>
-            <p className="text-sm">Організацій не знайдено</p>
-            <Button size="sm" className="mt-3" onClick={() => setShowCreateModal(true)}>
-              Створити організацію
-            </Button>
-          </div>
-        </Card>
+        <EmptyState
+          icon={Building2}
+          title="Організацій не знайдено"
+          description="Створіть свою першу організацію або зверніться до адміністратора залу"
+          action="Створити організацію"
+          onAction={() => setShowCreateModal(true)}
+        />
       ) : (
         <div className="space-y-3">
           {organizations.map((org) => {
@@ -84,19 +85,19 @@ export default function Organizations() {
             return (
               <Card
                 key={org.id}
-                className={isActive ? 'border-primary-500/50 bg-primary-600/5' : ''}
+                className={isActive ? 'border-brand-500/30 bg-brand-500/5' : ''}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg ${
-                      isActive ? 'bg-primary-600/30' : 'bg-surface-700'
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                      isActive ? 'bg-brand-500/20' : 'bg-surface-700'
                     }`}>
-                      🏢
+                      <Building2 className={`h-5 w-5 ${isActive ? 'text-brand-400' : 'text-slate-500'}`} />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
                         <p className="font-semibold text-slate-100">{org.name}</p>
-                        {isActive && <Badge color="active">Активна</Badge>}
+                        {isActive && <Badge color="active" dot>Активна</Badge>}
                       </div>
                       <p className="text-xs text-slate-500">@{org.slug}</p>
                     </div>
@@ -126,13 +127,17 @@ export default function Organizations() {
       {/* Admin actions */}
       {currentOrg && isAdmin() && (
         <div className="mt-8">
-          <h3 className="text-sm font-medium text-slate-400 uppercase tracking-wide mb-3">
-            Управління: {currentOrg.name}
-          </h3>
+          <div className="flex items-center gap-2 mb-3">
+            <Shield className="h-4 w-4 text-slate-500" />
+            <h3 className="text-sm font-medium text-slate-400 uppercase tracking-wide">
+              Управління: {currentOrg.name}
+            </h3>
+          </div>
           <Card>
-            <CardHeader title="Управління командою" subtitle="Запросіть учасників до вашої організації" />
+            <CardHeader title="Управління командою" icon={Shield} subtitle="Запросіть учасників до вашої організації" />
             <Button
               size="sm"
+              icon={UserPlus}
               onClick={() => setShowInviteModal(true)}
             >
               Запросити учасника
@@ -170,18 +175,16 @@ export default function Organizations() {
             required
             autoFocus
           />
-          <div>
-            <label className="label">Роль</label>
-            <select
-              className="input"
-              value={inviteForm.role}
-              onChange={(e) => setInviteForm((p) => ({ ...p, role: e.target.value }))}
-            >
-              <option value="member">Учасник</option>
-              <option value="trainer">Тренер</option>
-              <option value="admin">Адмін</option>
-            </select>
-          </div>
+          <Select
+            label="Роль"
+            value={inviteForm.role}
+            onChange={(v) => setInviteForm((p) => ({ ...p, role: v }))}
+            options={[
+              { value: 'member',  label: 'Учасник' },
+              { value: 'trainer', label: 'Тренер' },
+              { value: 'admin',   label: 'Адмін' },
+            ]}
+          />
           <div className="flex gap-3">
             <Button variant="secondary" type="button" onClick={() => setShowInviteModal(false)} fullWidth>
               Скасувати

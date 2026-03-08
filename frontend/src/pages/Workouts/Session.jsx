@@ -3,11 +3,13 @@ import { useNavigate } from 'react-router-dom'
 import Layout from '@/components/layout/Layout'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
-import Input from '@/components/ui/Input'
+import SearchInput from '@/components/ui/SearchInput'
+import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import { SkeletonList } from '@/components/ui/Skeleton'
 import { useWorkoutStore } from '@/store/workoutStore'
 import { useAddSet, useExercises } from '@/hooks/useWorkouts'
 import { formatDate } from '@/utils/helpers'
+import { Check, Plus, Minus, Flag } from '../../utils/icons'
 import toast from 'react-hot-toast'
 
 export default function Session() {
@@ -20,6 +22,7 @@ export default function Session() {
   const [reps, setReps] = useState('')
   const [weight, setWeight] = useState('')
   const [search, setSearch] = useState('')
+  const [showFinishConfirm, setShowFinishConfirm] = useState(false)
 
   if (!activeSession) {
     return (
@@ -66,7 +69,7 @@ export default function Session() {
           <p className="text-caption text-slate-500">Сесія · {formatDate(activeSession.date)}</p>
           <h2 className="text-h2">Тренування</h2>
         </div>
-        <Button variant="danger" onClick={handleFinish}>
+        <Button variant="danger" icon={Flag} onClick={() => setShowFinishConfirm(true)}>
           Завершити
         </Button>
       </div>
@@ -88,10 +91,10 @@ export default function Session() {
       {/* Exercise selector */}
       <Card className="mb-4">
         <p className="section-title">Обрати вправу</p>
-        <Input
-          placeholder="Пошук вправ..."
+        <SearchInput
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={setSearch}
+          placeholder="Пошук вправ..."
           className="mb-3"
         />
         {loadingExercises ? (
@@ -118,7 +121,7 @@ export default function Session() {
                   </p>
                   <p className="text-caption text-slate-500">{ex.muscle_group}</p>
                 </div>
-                {exerciseId === ex.id && <span className="text-brand-500 text-lg">✓</span>}
+                {exerciseId === ex.id && <Check className="h-4 w-4 text-brand-500 shrink-0" />}
               </button>
             ))}
           </div>
@@ -184,9 +187,10 @@ export default function Session() {
                     key={delta}
                     type="button"
                     onClick={() => setWeight((w) => String(Math.max(0, parseFloat(w || 0) + delta)))}
-                    className="flex-1 py-1.5 rounded-lg text-[11px] font-medium bg-surface-750 text-slate-500 hover:text-slate-300 transition-colors"
+                    className="flex-1 py-1.5 rounded-lg text-[11px] font-medium bg-surface-750 text-slate-500 hover:text-slate-300 transition-colors flex items-center justify-center gap-0.5"
                   >
-                    {delta > 0 ? '+' : ''}{delta}
+                    {delta > 0 ? <Plus className="h-2.5 w-2.5" /> : <Minus className="h-2.5 w-2.5" />}
+                    {Math.abs(delta)}
                   </button>
                 ))}
               </div>
@@ -197,12 +201,13 @@ export default function Session() {
             type="button"
             onClick={handleAddSet}
             disabled={loading}
-            className="w-full py-4 rounded-2xl font-bold text-lg text-white transition-all active:scale-95"
+            className="w-full py-4 rounded-2xl font-bold text-lg text-white transition-all active:scale-95 flex items-center justify-center gap-2"
             style={{
               background: loading ? '#3f3f48' : 'linear-gradient(135deg, rgb(var(--brand-600)), rgb(var(--brand-500)))',
             }}
           >
-            {loading ? '...' : '+ Додати підхід'}
+            <Plus className="h-5 w-5" />
+            {loading ? 'Збереження...' : 'Додати підхід'}
           </button>
         </Card>
       )}
@@ -232,6 +237,15 @@ export default function Session() {
           </div>
         </Card>
       )}
+      <ConfirmDialog
+        isOpen={showFinishConfirm}
+        onClose={() => setShowFinishConfirm(false)}
+        onConfirm={handleFinish}
+        title="Завершити тренування?"
+        description={`Збережено ${sessionSets.length} підхід${sessionSets.length !== 1 ? 'ів' : ''}. Продовжити?`}
+        confirmLabel="Завершити"
+        variant="danger"
+      />
     </Layout>
   )
 }

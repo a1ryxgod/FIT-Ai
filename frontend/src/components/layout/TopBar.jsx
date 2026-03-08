@@ -1,6 +1,7 @@
 import { useAuthStore } from '@/store/authStore'
 import { useOrgStore } from '@/store/orgStore'
 import { useNavigate } from 'react-router-dom'
+import { ChevronDown } from '../../utils/icons'
 
 export default function TopBar({ title }) {
   const user = useAuthStore((s) => s.user)
@@ -8,7 +9,15 @@ export default function TopBar({ title }) {
   const navigate = useNavigate()
 
   return (
-    <header className="flex items-center justify-between px-4 md:px-6 py-3.5 sticky top-0 z-30" style={{ background: 'rgba(20,20,22,0.9)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+    <header
+      className="flex items-center justify-between px-4 md:px-6 py-3.5 sticky top-0 z-30"
+      style={{
+        background: 'rgba(20,20,22,0.9)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(255,255,255,0.05)',
+      }}
+    >
       <div>
         <h1 className="text-small font-semibold text-slate-100 md:text-base">{title}</h1>
         {currentOrg && (
@@ -22,11 +31,14 @@ export default function TopBar({ title }) {
         <div className="w-8 h-8 bg-brand-500/20 border border-brand-500/30 rounded-full flex items-center justify-center text-brand-400 text-small font-bold">
           {user?.username?.[0]?.toUpperCase() ?? '?'}
         </div>
-        <div className="hidden sm:block text-left">
-          <p className="text-small font-semibold text-slate-200">{user?.username}</p>
-          {currentOrg && (
-            <p className="text-caption text-slate-500 capitalize">{currentOrg.role}</p>
-          )}
+        <div className="hidden sm:flex items-center gap-1 text-left">
+          <div>
+            <p className="text-small font-semibold text-slate-200">{user?.username}</p>
+            {currentOrg && (
+              <p className="text-caption text-slate-500 capitalize">{currentOrg.role}</p>
+            )}
+          </div>
+          <ChevronDown className="h-3.5 w-3.5 text-slate-600 ml-0.5" />
         </div>
       </button>
     </header>

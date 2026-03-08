@@ -1,11 +1,13 @@
 import { clsx } from 'clsx'
-import Spinner from './Spinner'
+import { motion } from 'framer-motion'
+import { Loader2 } from '../../utils/icons'
 
 const variants = {
   primary:   'btn-primary',
   secondary: 'btn-secondary',
   ghost:     'btn-ghost',
   danger:    'btn-danger',
+  gradient:  'btn-primary bg-brand-gradient hover:opacity-90 shadow-brand',
 }
 
 const sizes = {
@@ -22,10 +24,14 @@ export default function Button({
   disabled = false,
   className = '',
   fullWidth = false,
+  icon: Icon = null,
+  iconRight: IconRight = null,
   ...props
 }) {
   return (
-    <button
+    <motion.button
+      whileTap={{ scale: 0.97 }}
+      transition={{ duration: 0.1 }}
       className={clsx(
         variants[variant],
         sizes[size],
@@ -35,8 +41,12 @@ export default function Button({
       disabled={disabled || loading}
       {...props}
     >
-      {loading && <Spinner size="sm" />}
+      {loading
+        ? <Loader2 className="h-4 w-4 animate-spin" />
+        : Icon && <Icon className="h-4 w-4 flex-shrink-0" />
+      }
       {children}
-    </button>
+      {!loading && IconRight && <IconRight className="h-4 w-4 flex-shrink-0" />}
+    </motion.button>
   )
 }

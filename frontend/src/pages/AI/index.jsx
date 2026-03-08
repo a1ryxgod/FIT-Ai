@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import Layout from '@/components/layout/Layout'
 import Button from '@/components/ui/Button'
 import Spinner from '@/components/ui/Spinner'
 import { useChatHistory, useSendMessage, useAnalyzeWorkouts } from '@/hooks/useAI'
+import { Bot, Send, Sparkles, Apple, Dumbbell, Target, BrainCircuit } from '../../utils/icons'
 
 const QUICK_PROMPTS = [
   'Як моє харчування сьогодні?',
@@ -115,6 +117,7 @@ export default function AIChat() {
               onClick={() => handleSend()}
               disabled={!input.trim() || isPending}
               loading={sendMessage.isPending}
+              icon={Send}
               className="shrink-0"
             >
               Надіслати
@@ -123,8 +126,9 @@ export default function AIChat() {
           <button
             onClick={handleAnalyze}
             disabled={isPending}
-            className="mt-2 w-full text-center text-caption text-brand-400 hover:text-brand-300 transition-colors disabled:opacity-40"
+            className="mt-2 w-full flex items-center justify-center gap-1.5 text-caption text-brand-400 hover:text-brand-300 transition-colors disabled:opacity-40"
           >
+            <Sparkles className="h-3.5 w-3.5" />
             Аналіз моїх тренувань
           </button>
         </div>
@@ -133,41 +137,57 @@ export default function AIChat() {
   )
 }
 
+const QUICK_PROMPT_ICONS = [Apple, Dumbbell, Target, BrainCircuit]
+
 function EmptyChat({ onPrompt }) {
   return (
-    <div className="flex flex-col items-center justify-center h-full py-8 text-center">
-      <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-black text-white mb-4"
-        style={{ background: 'rgb(var(--brand-500))' }}>
-        AI
+    <motion.div
+      className="flex flex-col items-center justify-center h-full py-8 text-center"
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
+        style={{ background: 'linear-gradient(135deg, rgb(var(--brand-600)), rgb(var(--brand-400)))' }}>
+        <Bot className="h-8 w-8 text-white" />
       </div>
       <h3 className="text-small font-semibold text-slate-300 mb-1">Ваш AI фітнес-тренер</h3>
       <p className="text-caption text-slate-600 mb-6 max-w-xs">
         Запитуйте про харчування, тренування або отримуйте персональні поради.
       </p>
       <div className="grid grid-cols-1 gap-2 w-full max-w-xs">
-        {QUICK_PROMPTS.map((prompt) => (
-          <button
-            key={prompt}
-            onClick={() => onPrompt(prompt)}
-            className="text-left px-4 py-3 rounded-xl text-small text-slate-300 transition-colors"
-            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}
-          >
-            {prompt}
-          </button>
-        ))}
+        {QUICK_PROMPTS.map((prompt, i) => {
+          const Icon = QUICK_PROMPT_ICONS[i % QUICK_PROMPT_ICONS.length]
+          return (
+            <button
+              key={prompt}
+              onClick={() => onPrompt(prompt)}
+              className="flex items-center gap-3 text-left px-4 py-3 rounded-xl text-small text-slate-300 transition-colors hover:bg-white/5"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}
+            >
+              <Icon className="h-4 w-4 text-brand-400 shrink-0" />
+              {prompt}
+            </button>
+          )
+        })}
       </div>
-    </div>
+    </motion.div>
   )
 }
 
 function MessageBubble({ role, text }) {
   const isUser = role === 'user'
   return (
-    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
+    <motion.div
+      className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}
+      initial={{ opacity: 0, x: isUser ? 12 : -12 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.2 }}
+    >
       {!isUser && (
-        <div className="w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-black text-white mr-2 shrink-0 mt-0.5"
+        <div className="w-7 h-7 rounded-lg flex items-center justify-center mr-2 shrink-0 mt-0.5"
           style={{ background: 'rgb(var(--brand-500))' }}>
-          AI
+          <Bot className="h-4 w-4 text-white" />
         </div>
       )}
       <div
@@ -183,7 +203,7 @@ function MessageBubble({ role, text }) {
       >
         {text}
       </div>
-    </div>
+    </motion.div>
   )
 }
 

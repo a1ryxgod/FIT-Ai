@@ -146,4 +146,41 @@
     border-color: rgba(255, 255, 255, 0.06);
     @apply border-t my-4;
   }
+
+  /* ── Glass container ── */
+  .glass {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  /* ── Gradient text ── */
+  .gradient-text {
+    background: linear-gradient(135deg, rgb(var(--brand-400)), rgb(var(--brand-300)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ── Icon container ── */
+  .icon-container {
+    @apply inline-flex items-center justify-center rounded-xl;
+    background: rgba(var(--brand-500), 0.12);
+    color: rgb(var(--brand-400));
+  }
+  .icon-container-sm { @apply icon-container w-8 h-8; }
+  .icon-container-md { @apply icon-container w-10 h-10; }
+  .icon-container-lg { @apply icon-container w-12 h-12; }
+
+  /* ── Ring progress track ── */
+  .ring-track {
+    fill: none;
+    stroke: rgba(255,255,255,0.06);
+  }
+  .ring-fill {
+    fill: none;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.8s cubic-bezier(0.16,1,0.3,1);
+  }
 }
