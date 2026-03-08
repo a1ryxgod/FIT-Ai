@@ -4,30 +4,39 @@ import { motion } from 'framer-motion'
 import { useOrgStore } from '@/store/orgStore'
 import {
   LayoutDashboard, Dumbbell, UtensilsCrossed,
-  TrendingUp, Bot, User, Users,
+  TrendingUp, Bot, User, Users, ClipboardList,
 } from '../../utils/icons'
 
 const MEMBER_NAV = [
   { to: '/',          label: 'Головна',  exact: true, icon: LayoutDashboard },
   { to: '/workouts',  label: 'Трен.',    icon: Dumbbell },
-  { to: '/nutrition', label: 'Їжа',     icon: UtensilsCrossed },
-  { to: '/ai',        label: 'AI',      icon: Bot },
-  { to: '/progress',  label: 'Прогрес', icon: TrendingUp },
-  { to: '/profile',   label: 'Профіль', icon: User },
+  { to: '/nutrition', label: 'Їжа',      icon: UtensilsCrossed },
+  { to: '/ai',        label: 'AI',       icon: Bot },
+  { to: '/progress',  label: 'Прогрес',  icon: TrendingUp },
+  { to: '/profile',   label: 'Профіль',  icon: User },
+]
+
+const TRAINER_NAV = [
+  { to: '/',          label: 'Головна',  exact: true, icon: LayoutDashboard },
+  { to: '/trainer',   label: 'Клієнти',  icon: ClipboardList },
+  { to: '/workouts',  label: 'Трен.',    icon: Dumbbell },
+  { to: '/ai',        label: 'AI',       icon: Bot },
+  { to: '/progress',  label: 'Прогрес',  icon: TrendingUp },
+  { to: '/profile',   label: 'Профіль',  icon: User },
 ]
 
 const ADMIN_NAV = [
   { to: '/',          label: 'Головна',  exact: true, icon: LayoutDashboard },
   { to: '/workouts',  label: 'Трен.',    icon: Dumbbell },
   { to: '/members',   label: 'Учасники', icon: Users },
-  { to: '/ai',        label: 'AI',      icon: Bot },
-  { to: '/progress',  label: 'Прогрес', icon: TrendingUp },
-  { to: '/profile',   label: 'Профіль', icon: User },
+  { to: '/trainer',   label: 'Клієнти',  icon: ClipboardList },
+  { to: '/ai',        label: 'AI',       icon: Bot },
+  { to: '/profile',   label: 'Профіль',  icon: User },
 ]
 
 export default function MobileNav() {
-  const { isAdmin } = useOrgStore()
-  const NAV = isAdmin() ? ADMIN_NAV : MEMBER_NAV
+  const { isAdmin, isTrainer } = useOrgStore()
+  const NAV = isAdmin() ? ADMIN_NAV : isTrainer() ? TRAINER_NAV : MEMBER_NAV
 
   return (
     <nav

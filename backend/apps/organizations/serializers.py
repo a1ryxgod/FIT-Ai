@@ -18,11 +18,14 @@ class OrganizationSerializer(serializers.ModelSerializer):
 class MembershipSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source="user.username", read_only=True)
     email = serializers.CharField(source="user.email", read_only=True)
+    user_id = serializers.UUIDField(source="user.id", read_only=True)
+    trainer_id = serializers.UUIDField(source="trainer.id", read_only=True, allow_null=True, default=None)
+    trainer_username = serializers.CharField(source="trainer.username", read_only=True, allow_null=True, default=None)
 
     class Meta:
         model = Membership
-        fields = ["id", "username", "email", "role", "created_at"]
-        read_only_fields = ["id", "username", "email", "created_at"]
+        fields = ["id", "user_id", "username", "email", "role", "trainer_id", "trainer_username", "created_at"]
+        read_only_fields = ["id", "user_id", "username", "email", "trainer_id", "trainer_username", "created_at"]
 
 
 class InviteSerializer(serializers.Serializer):

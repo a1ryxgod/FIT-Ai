@@ -7,6 +7,7 @@ import Badge from '@/components/ui/Badge'
 import Select from '@/components/ui/Select'
 import { useOrgStore } from '@/store/orgStore'
 import { useMembers, useInviteMember } from '@/hooks/useMembers'
+import { useAssignTrainer } from '@/hooks/useTrainer'
 import { Users, UserPlus, User } from '../../utils/icons'
 
 const ROLE_OPTIONS = [
@@ -15,7 +16,21 @@ const ROLE_OPTIONS = [
   { value: 'admin',   label: 'Адмін' },
 ]
 
-function MemberRow({ member }) {
+function MemberRow({ member, trainers, isAdmin }) {
+  const assignTrainer = useAssignTrainer()
+
+  const trainerOptions = [
+    { value: '', label: 'Без тренера' },
+    ...trainers.map((t) => ({ value: t.user_id, label: t.username })),
+  ]
+
+  const handleTrainerChange = (trainerId) => {
+    assignTrainer.mutate({
+      trainer_id: trainerId || null,
+      member_id: member.user_id,
+    })
+  }
+
   return (
     <div className="flex items-center gap-3 py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
       <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
@@ -25,19 +40,34 @@ function MemberRow({ member }) {
       <div className="flex-1 min-w-0">
         <p className="font-semibold text-slate-100 text-small truncate">{member.username}</p>
         <p className="text-caption text-slate-500 truncate">{member.email}</p>
+        {member.trainer_username && (
+          <p className="text-[10px] text-brand-400/70 mt-0.5">Тренер: {member.trainer_username}</p>
+        )}
       </div>
-      <Badge color={member.role}>{member.role}</Badge>
+      <div className="flex items-center gap-2 shrink-0">
+        {isAdmin && member.role === 'member' && trainers.length > 0 && (
+          <Select
+            value={member.trainer_id ?? ''}
+            onChange={handleTrainerChange}
+            options={trainerOptions}
+            placeholder="Тренер"
+          />
+        )}
+        <Badge color={member.role}>{member.role}</Badge>
+      </div>
     </div>
   )
 }
 
 export default function Members() {
-  const { currentOrg } = useOrgStore()
+  const { currentOrg, isAdmin } = useOrgStore()
   const { data: members = [], isLoading } = useMembers(currentOrg?.id)
   const { mutate: invite, isPending: inviting } = useInviteMember(currentOrg?.id)
 
   const [form, setForm] = useState({ username: '', role: 'member' })
   const onChange = (e) => setForm((p) => ({ ...p, [e.target.name]: e.target.value }))
+
+  const trainers = members.filter((m) => ['trainer', 'admin', 'owner'].includes(m.role))
 
   const handleInvite = (e) => {
     e.preventDefault()
@@ -62,7 +92,7 @@ export default function Members() {
         ) : (
           <div>
             {members.map((m) => (
-              <MemberRow key={m.id} member={m} />
+              <MemberRow key={m.id} member={m} trainers={trainers} isAdmin={isAdmin()} />
             ))}
           </div>
         )}

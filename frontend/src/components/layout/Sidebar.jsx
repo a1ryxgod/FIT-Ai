@@ -5,7 +5,7 @@ import { useThemeStore } from '@/store/themeStore'
 import { useOrgStore } from '@/store/orgStore'
 import {
   LayoutDashboard, Dumbbell, UtensilsCrossed, TrendingUp,
-  Bot, User, Users, Building2,
+  Bot, User, Users, Building2, ClipboardList,
 } from '../../utils/icons'
 
 const MEMBER_NAV = [
@@ -17,9 +17,20 @@ const MEMBER_NAV = [
   { to: '/profile',    label: 'Профіль',     icon: User },
 ]
 
+const TRAINER_NAV = [
+  { to: '/',           label: 'Головна',     exact: true, icon: LayoutDashboard },
+  { to: '/trainer',    label: 'Клієнти',     icon: ClipboardList },
+  { to: '/workouts',   label: 'Тренування',  icon: Dumbbell },
+  { to: '/nutrition',  label: 'Харчування',  icon: UtensilsCrossed },
+  { to: '/progress',   label: 'Прогрес',     icon: TrendingUp },
+  { to: '/ai',         label: 'AI Тренер',   icon: Bot },
+  { to: '/profile',    label: 'Профіль',     icon: User },
+]
+
 const ADMIN_NAV = [
   { to: '/',           label: 'Головна',     exact: true, icon: LayoutDashboard },
   { to: '/members',    label: 'Учасники',    icon: Users },
+  { to: '/trainer',    label: 'Клієнти',     icon: ClipboardList },
   { to: '/workouts',   label: 'Тренування',  icon: Dumbbell },
   { to: '/nutrition',  label: 'Харчування',  icon: UtensilsCrossed },
   { to: '/progress',   label: 'Прогрес',     icon: TrendingUp },
@@ -30,8 +41,8 @@ const ADMIN_NAV = [
 
 export default function Sidebar() {
   const { theme } = useThemeStore()
-  const { currentOrg, isAdmin } = useOrgStore()
-  const NAV = isAdmin() ? ADMIN_NAV : MEMBER_NAV
+  const { currentOrg, isAdmin, isTrainer } = useOrgStore()
+  const NAV = isAdmin() ? ADMIN_NAV : isTrainer() ? TRAINER_NAV : MEMBER_NAV
 
   return (
     <aside
