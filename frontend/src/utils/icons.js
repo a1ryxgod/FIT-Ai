@@ -67,6 +67,8 @@ import {
   Flag,
   ClipboardList,
   GripVertical,
+  Copy,
+  RefreshCw,
 } from 'lucide-react'
 
 export const NAV_ICONS = {
@@ -151,5 +153,5 @@ export {
   Activity, Apple, Coffee, Sun, Moon, Cookie, AlertTriangle, Info, Bell,
   Calculator, FolderOpen, Calendar, Sparkles, BrainCircuit, Shield, UserPlus,
   Loader2, Hash, Weight, ArrowUp, ArrowDown, TrendingDown,
-  Mail, Lock, Flag, ClipboardList, GripVertical,
+  Mail, Lock, Flag, ClipboardList, GripVertical, Copy, RefreshCw,
 }

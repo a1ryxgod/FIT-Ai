@@ -17,15 +17,30 @@ class RegisterView(APIView):
         serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
-        user, org = services.register_user(
-            username=data["username"],
-            email=data["email"],
-            password=data["password"],
-            organization_name=data["organization_name"],
-        )
-        refresh = RefreshToken.for_user(user)
-        refresh["org_id"] = str(org.id)
-        refresh["role"] = "owner"
+        org_name = data.get("organization_name", "").strip()
+
+        if org_name:
+            user, org = services.register_user(
+                username=data["username"],
+                email=data["email"],
+                password=data["password"],
+                organization_name=org_name,
+            )
+            refresh = RefreshToken.for_user(user)
+            refresh["org_id"] = str(org.id)
+            refresh["role"] = "owner"
+            org_data = {"id": str(org.id), "name": org.name, "slug": org.slug, "join_code": org.join_code}
+        else:
+            user = services.register_user_only(
+                username=data["username"],
+                email=data["email"],
+                password=data["password"],
+            )
+            refresh = RefreshToken.for_user(user)
+            refresh["org_id"] = None
+            refresh["role"] = None
+            org_data = None
+
         return Response(
             {
                 "user": {
@@ -33,11 +48,7 @@ class RegisterView(APIView):
                     "username": user.username,
                     "email": user.email,
                 },
-                "organization": {
-                    "id": str(org.id),
-                    "name": org.name,
-                    "slug": org.slug,
-                },
+                "organization": org_data,
                 "tokens": {
                     "access": str(refresh.access_token),
                     "refresh": str(refresh),

@@ -9,6 +9,7 @@ import { SkeletonList } from '@/components/ui/Skeleton'
 import EmptyState from '@/components/ui/EmptyState'
 import { usePrograms, useCreateProgram, useStartSession } from '@/hooks/useWorkouts'
 import { useNavigate } from 'react-router-dom'
+import { useOrgStore } from '@/store/orgStore'
 import { formatDate } from '@/utils/helpers'
 import { Play, Plus, FolderOpen, Dumbbell } from '../../utils/icons'
 
@@ -17,6 +18,7 @@ export default function Workouts() {
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [programName, setProgramName] = useState('')
 
+  const { isTrainer } = useOrgStore()
   const { data: programs = [], isLoading } = usePrograms()
   const createProgram = useCreateProgram()
   const { startSession, loading: startLoading } = useStartSession()
@@ -44,7 +46,7 @@ export default function Workouts() {
         <h2 className="text-h2">Тренування</h2>
         <div className="flex gap-2">
           <Button variant="secondary" onClick={() => navigate('/workouts/history')} size="sm">Історія</Button>
-          <Button onClick={() => setShowCreateModal(true)} size="sm">+ Програма</Button>
+          {isTrainer() && <Button onClick={() => setShowCreateModal(true)} size="sm">+ Програма</Button>}
         </div>
       </div>
 
@@ -99,7 +101,7 @@ export default function Workouts() {
         </div>
       )}
 
-      <Modal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} title="Нова програма">
+      {isTrainer() && <Modal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} title="Нова програма">
         <div className="space-y-4">
           <Input
             label="Назва програми"
@@ -114,7 +116,7 @@ export default function Workouts() {
             <Button onClick={handleCreate} loading={createProgram.isPending} fullWidth>Створити</Button>
           </div>
         </div>
-      </Modal>
+      </Modal>}
     </Layout>
   )
 }

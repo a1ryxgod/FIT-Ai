@@ -61,16 +61,17 @@ export function useRegister() {
     setLoading(true)
     try {
       const resp = await authApi.register(data)
-      login({ access: resp.data.access, refresh: resp.data.refresh })
+      login({ access: resp.data.tokens.access, refresh: resp.data.tokens.refresh })
 
-      if (resp.data.org_id) {
-        const org = { id: resp.data.org_id, name: resp.data.org_name ?? data.organization_name, role: 'owner' }
+      if (resp.data.organization) {
+        const org = { ...resp.data.organization, role: 'owner' }
         setCurrentOrg(org)
         setOrganizations([org])
+        navigate('/')
+      } else {
+        navigate('/organizations')
       }
-
-      navigate('/')
-      toast.success('Account created!')
+      toast.success('Акаунт створено!')
     } catch (err) {
       const msg = err.response?.data?.error ?? 'Registration failed'
       toast.error(msg)

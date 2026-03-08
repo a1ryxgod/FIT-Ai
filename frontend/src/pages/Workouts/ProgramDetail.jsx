@@ -19,6 +19,7 @@ import {
   useExercises,
   useStartSession,
 } from '@/hooks/useWorkouts'
+import { useOrgStore } from '@/store/orgStore'
 import {
   ChevronLeft, Play, Plus, Trash2, ChevronUp, ChevronDown,
   Dumbbell, Pencil, Check, X,
@@ -30,6 +31,9 @@ export default function ProgramDetail() {
   const [showAddModal, setShowAddModal] = useState(false)
   const [editingId, setEditingId] = useState(null)
   const [editForm, setEditForm] = useState({ target_sets: 3, target_reps: 10, target_weight: 0 })
+
+  const { isTrainer } = useOrgStore()
+  const canEdit = isTrainer()
 
   const { data: programs = [] } = usePrograms()
   const program = programs.find((p) => p.id === id)
@@ -100,9 +104,9 @@ export default function ProgramDetail() {
         <EmptyState
           icon={Dumbbell}
           title="Вправ ще немає"
-          description="Додайте вправи до програми"
-          action="Додати вправу"
-          onAction={() => setShowAddModal(true)}
+          description={canEdit ? 'Додайте вправи до програми' : 'Тренер ще не додав вправи'}
+          action={canEdit ? 'Додати вправу' : undefined}
+          onAction={canEdit ? () => setShowAddModal(true) : undefined}
         />
       ) : (
         <div className="space-y-2">
@@ -130,7 +134,7 @@ export default function ProgramDetail() {
                     </div>
 
                     {/* Targets */}
-                    {editingId === pe.id ? (
+                    {canEdit && editingId === pe.id ? (
                       <div className="flex items-center gap-1.5">
                         <input
                           type="number" value={editForm.target_sets} min={1}
@@ -163,27 +167,31 @@ export default function ProgramDetail() {
                           {pe.target_sets}×{pe.target_reps}
                           {pe.target_weight > 0 && <span className="text-slate-500"> @ {pe.target_weight}кг</span>}
                         </span>
-                        <button onClick={() => startEdit(pe)} className="p-1 rounded text-slate-500 hover:text-slate-300 hover:bg-surface-700">
-                          <Pencil className="h-3.5 w-3.5" />
-                        </button>
+                        {canEdit && (
+                          <button onClick={() => startEdit(pe)} className="p-1 rounded text-slate-500 hover:text-slate-300 hover:bg-surface-700">
+                            <Pencil className="h-3.5 w-3.5" />
+                          </button>
+                        )}
                       </div>
                     )}
 
                     {/* Reorder + Delete */}
-                    <div className="flex items-center gap-0.5 flex-shrink-0">
-                      <button onClick={() => handleMoveUp(idx)} disabled={idx === 0}
-                        className="p-1 rounded text-slate-500 hover:text-slate-300 hover:bg-surface-700 disabled:opacity-30">
-                        <ChevronUp className="h-4 w-4" />
-                      </button>
-                      <button onClick={() => handleMoveDown(idx)} disabled={idx === programExercises.length - 1}
-                        className="p-1 rounded text-slate-500 hover:text-slate-300 hover:bg-surface-700 disabled:opacity-30">
-                        <ChevronDown className="h-4 w-4" />
-                      </button>
-                      <button onClick={() => deleteExercise.mutate(pe.id)}
-                        className="p-1 rounded text-red-500/60 hover:text-red-400 hover:bg-red-500/10">
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
+                    {canEdit && (
+                      <div className="flex items-center gap-0.5 flex-shrink-0">
+                        <button onClick={() => handleMoveUp(idx)} disabled={idx === 0}
+                          className="p-1 rounded text-slate-500 hover:text-slate-300 hover:bg-surface-700 disabled:opacity-30">
+                          <ChevronUp className="h-4 w-4" />
+                        </button>
+                        <button onClick={() => handleMoveDown(idx)} disabled={idx === programExercises.length - 1}
+                          className="p-1 rounded text-slate-500 hover:text-slate-300 hover:bg-surface-700 disabled:opacity-30">
+                          <ChevronDown className="h-4 w-4" />
+                        </button>
+                        <button onClick={() => deleteExercise.mutate(pe.id)}
+                          className="p-1 rounded text-red-500/60 hover:text-red-400 hover:bg-red-500/10">
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </Card>
               </motion.div>
@@ -192,21 +200,23 @@ export default function ProgramDetail() {
         </div>
       )}
 
-      {/* Add button */}
-      {programExercises.length > 0 && (
+      {/* Add button — trainers/admins only */}
+      {canEdit && programExercises.length > 0 && (
         <Button variant="secondary" onClick={() => setShowAddModal(true)} icon={Plus} fullWidth className="mt-4">
           Додати вправу
         </Button>
       )}
 
-      {/* Add Exercise Modal */}
-      <AddExerciseModal
-        isOpen={showAddModal}
-        onClose={() => setShowAddModal(false)}
-        programId={id}
-        existingExerciseIds={programExercises.map((pe) => pe.exercise.id)}
-        onAdd={addExercise}
-      />
+      {/* Add Exercise Modal — trainers/admins only */}
+      {canEdit && (
+        <AddExerciseModal
+          isOpen={showAddModal}
+          onClose={() => setShowAddModal(false)}
+          programId={id}
+          existingExerciseIds={programExercises.map((pe) => pe.exercise.id)}
+          onAdd={addExercise}
+        />
+      )}
     </Layout>
   )
 }

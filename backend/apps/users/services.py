@@ -18,3 +18,14 @@ def register_user(username: str, email: str, password: str, organization_name: s
     Profile.objects.create(user=user)
     org = create_organization(user=user, name=organization_name)
     return user, org
+
+
+@transaction.atomic
+def register_user_only(username: str, email: str, password: str):
+    user = User.objects.create_user(
+        username=username,
+        email=email,
+        password=password,
+    )
+    Profile.objects.create(user=user)
+    return user

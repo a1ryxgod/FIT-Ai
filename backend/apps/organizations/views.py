@@ -10,6 +10,7 @@ from apps.core.permissions import IsAdmin, IsOrganizationMember
 
 from . import services
 from .models import Membership, Organization
+from .models import generate_join_code
 from .serializers import InviteSerializer, MembershipSerializer, OrganizationSerializer
 
 
@@ -70,3 +71,48 @@ class SwitchOrganizationView(APIView):
             "org_id": str(org.id),
             "role": membership.role,
         })
+
+
+class JoinOrganizationView(APIView):
+    """POST /api/orgs/join/ — join org with a join_code, become member."""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        join_code = request.data.get("join_code", "").strip().upper()
+        if not join_code:
+            return Response({"detail": "join_code is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        org = Organization.objects.filter(
+            join_code=join_code, is_active=True, is_deleted=False,
+        ).first()
+        if not org:
+            return Response({"detail": "Невірний код. Перевірте та спробуйте знову."}, status=status.HTTP_404_NOT_FOUND)
+
+        membership, created = Membership.objects.get_or_create(
+            user=request.user,
+            organization=org,
+            defaults={"role": Membership.Role.MEMBER},
+        )
+
+        refresh = RefreshToken.for_user(request.user)
+        refresh["org_id"] = str(org.id)
+        refresh["role"] = membership.role
+
+        return Response({
+            "access": str(refresh.access_token),
+            "refresh": str(refresh),
+            "organization": OrganizationSerializer(org).data,
+            "role": membership.role,
+            "created": created,
+        }, status=status.HTTP_200_OK)
+
+
+class RegenerateJoinCodeView(APIView):
+    """POST /api/orgs/<pk>/regenerate-code/ — admin regenerates the join code."""
+    permission_classes = [IsAuthenticated, IsOrganizationMember, IsAdmin]
+
+    def post(self, request, pk):
+        org = get_object_or_404(Organization, pk=pk, is_active=True, is_deleted=False)
+        org.join_code = generate_join_code()
+        org.save(update_fields=["join_code"])
+        return Response({"join_code": org.join_code})

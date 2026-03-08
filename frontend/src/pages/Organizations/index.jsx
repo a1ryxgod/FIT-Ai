@@ -11,8 +11,9 @@ import Select from '@/components/ui/Select'
 import EmptyState from '@/components/ui/EmptyState'
 import { useOrgStore } from '@/store/orgStore'
 import { useSwitchOrg, useCreateOrg, useInviteUser } from '@/hooks/useOrg'
+import { useJoinOrg, useRegenerateCode } from '@/hooks/useOrganizations'
 import { orgsApi } from '@/api/organizations'
-import { Building2, Plus, UserPlus, Shield, User } from '../../utils/icons'
+import { Building2, Plus, UserPlus, Shield, Copy, RefreshCw } from '../../utils/icons'
 
 export default function Organizations() {
   const navigate = useNavigate()
@@ -21,11 +22,15 @@ export default function Organizations() {
   const { createOrg, loading: createLoading } = useCreateOrg()
   const { invite, loading: inviteLoading } = useInviteUser()
 
+  const joinOrg = useJoinOrg()
+  const regenerateCode = useRegenerateCode()
+
   const [loadingOrgs, setLoadingOrgs] = useState(false)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showInviteModal, setShowInviteModal] = useState(false)
   const [orgName, setOrgName] = useState('')
   const [inviteForm, setInviteForm] = useState({ username: '', role: 'member' })
+  const [joinCode, setJoinCode] = useState('')
 
   useEffect(() => {
     const fetchOrgs = async () => {
@@ -124,6 +129,28 @@ export default function Organizations() {
         </div>
       )}
 
+      {/* Join code — for users without org */}
+      {!currentOrg && (
+        <div className="mt-6">
+          <Card>
+            <CardHeader title="Приєднатись до залу" icon={Building2} subtitle="Введіть код, отриманий від тренера" />
+            <div className="flex gap-2 mt-3">
+              <input
+                className="input flex-1 uppercase tracking-widest font-mono"
+                placeholder="напр. GYM-X8K2"
+                value={joinCode}
+                onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+                maxLength={8}
+                onKeyDown={(e) => e.key === 'Enter' && joinOrg.mutate(joinCode)}
+              />
+              <Button onClick={() => joinOrg.mutate(joinCode)} loading={joinOrg.isPending} disabled={!joinCode.trim()}>
+                Приєднатись
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
+
       {/* Admin actions */}
       {currentOrg && isAdmin() && (
         <div className="mt-8">
@@ -133,16 +160,44 @@ export default function Organizations() {
               Управління: {currentOrg.name}
             </h3>
           </div>
-          <Card>
-            <CardHeader title="Управління командою" icon={Shield} subtitle="Запросіть учасників до вашої організації" />
-            <Button
-              size="sm"
-              icon={UserPlus}
-              onClick={() => setShowInviteModal(true)}
-            >
-              Запросити учасника
-            </Button>
-          </Card>
+          <div className="space-y-3">
+            {/* Join code card */}
+            <Card>
+              <CardHeader title="Код для вступу" icon={Building2} subtitle="Поділіться цим кодом з клієнтами" />
+              <div className="flex items-center gap-3 mt-3">
+                <span className="font-mono text-2xl font-bold tracking-widest text-brand-400 bg-brand-500/10 px-4 py-2 rounded-xl">
+                  {currentOrg.join_code ?? '--------'}
+                </span>
+                <button
+                  onClick={() => { navigator.clipboard.writeText(currentOrg.join_code); }}
+                  className="p-2 rounded-lg text-slate-400 hover:text-slate-300 hover:bg-surface-700 transition-colors"
+                  title="Копіювати"
+                >
+                  <Copy className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => regenerateCode.mutate()}
+                  disabled={regenerateCode.isPending}
+                  className="p-2 rounded-lg text-slate-400 hover:text-slate-300 hover:bg-surface-700 transition-colors"
+                  title="Оновити код"
+                >
+                  <RefreshCw className={`h-4 w-4 ${regenerateCode.isPending ? 'animate-spin' : ''}`} />
+                </button>
+              </div>
+            </Card>
+
+            {/* Invite card */}
+            <Card>
+              <CardHeader title="Управління командою" icon={Shield} subtitle="Запросіть учасників до вашої організації" />
+              <Button
+                size="sm"
+                icon={UserPlus}
+                onClick={() => setShowInviteModal(true)}
+              >
+                Запросити учасника
+              </Button>
+            </Card>
+          </div>
         </div>
       )}
 

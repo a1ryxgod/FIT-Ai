@@ -1,8 +1,16 @@
+import secrets
+import string
+
 from django.conf import settings
 from django.db import models
 from django.utils.text import slugify
 
 from apps.core.models import BaseModel
+
+
+def generate_join_code():
+    chars = string.ascii_uppercase + string.digits
+    return ''.join(secrets.choice(chars) for _ in range(8))
 
 
 class Organization(BaseModel):
@@ -14,6 +22,7 @@ class Organization(BaseModel):
         related_name="owned_organizations",
     )
     is_active = models.BooleanField(default=True, db_index=True)
+    join_code = models.CharField(max_length=8, unique=True, default=generate_join_code)
 
     class Meta:
         ordering = ["name"]

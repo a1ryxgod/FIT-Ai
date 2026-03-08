@@ -7,6 +7,7 @@ import { useRegister } from '@/hooks/useAuth'
 import { User, Mail, Lock, Building2 } from '../../utils/icons'
 
 export default function Register() {
+  const [mode, setMode] = useState('create') // 'create' | 'join'
   const [form, setForm] = useState({
     username: '',
     email: '',
@@ -28,7 +29,7 @@ export default function Register() {
     if (!form.email.trim()) errs.email = "Обов'язкове поле"
     if (form.password.length < 8) errs.password = 'Мін. 8 символів'
     if (form.password !== form.password2) errs.password2 = 'Паролі не співпадають'
-    if (!form.organization_name.trim()) errs.organization_name = "Обов'язкове поле"
+    if (mode === 'create' && !form.organization_name.trim()) errs.organization_name = "Обов'язкове поле"
     return errs
   }
 
@@ -37,7 +38,9 @@ export default function Register() {
     const errs = validate()
     if (Object.keys(errs).length) return setErrors(errs)
     try {
-      await handleRegister(form)
+      const payload = { ...form }
+      if (mode === 'join') payload.organization_name = ''
+      await handleRegister(payload)
     } catch (err) {
       const data = err?.response?.data
       if (data && typeof data === 'object') {
@@ -74,6 +77,17 @@ export default function Register() {
         </div>
 
         <div className="card p-6">
+          {/* Mode toggle */}
+          <div className="flex rounded-xl overflow-hidden border border-white/10 mb-5">
+            {[['create', 'Створити зал'], ['join', 'Приєднатись до залу']].map(([m, label]) => (
+              <button key={m} type="button" onClick={() => setMode(m)}
+                className={"flex-1 py-2 text-sm font-medium transition-colors " + (mode === m ? 'text-white' : 'text-slate-400 hover:text-slate-300')}
+                style={mode === m ? { background: 'rgba(var(--brand-500),0.25)' } : {}}>
+                {label}
+              </button>
+            ))}
+          </div>
+
           <form onSubmit={onSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <Input
@@ -99,17 +113,23 @@ export default function Register() {
                 required
               />
             </div>
-            <Input
-              label="Назва організації / залу"
-              name="organization_name"
-              value={form.organization_name}
-              onChange={onChange}
-              error={errors.organization_name}
-              placeholder="Мій зал"
-              icon={Building2}
-              required
-              hint="Учасників можна запросити пізніше"
-            />
+            {mode === 'create' ? (
+              <Input
+                label="Назва організації / залу"
+                name="organization_name"
+                value={form.organization_name}
+                onChange={onChange}
+                error={errors.organization_name}
+                placeholder="Мій зал"
+                icon={Building2}
+                required
+                hint="Учасників можна запросити пізніше"
+              />
+            ) : (
+              <p className="text-caption text-slate-400 text-center py-1">
+                Після реєстрації введіть код від тренера, щоб приєднатись до залу
+              </p>
+            )}
             <Input
               label="Пароль"
               name="password"
@@ -133,7 +153,7 @@ export default function Register() {
               required
             />
             <Button type="submit" fullWidth loading={loading} size="lg" variant="gradient">
-              Створити акаунт
+              {mode === 'create' ? 'Створити акаунт та зал' : 'Створити акаунт'}
             </Button>
           </form>
 
