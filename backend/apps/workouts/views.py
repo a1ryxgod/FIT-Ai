@@ -38,6 +38,7 @@ class ExerciseListView(ListAPIView):
     serializer_class = ExerciseSerializer
     search_fields = ["name", "muscle_group"]
     queryset = Exercise.objects.all()
+    pagination_class = None  # Повертаємо всі вправи без пагінації
 
 
 class StartSessionView(APIView):

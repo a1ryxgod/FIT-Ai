@@ -22,6 +22,7 @@ export default function Session() {
   const [reps, setReps] = useState('')
   const [weight, setWeight] = useState('')
   const [search, setSearch] = useState('')
+  const [muscleFilter, setMuscleFilter] = useState('Всі')
   const [showFinishConfirm, setShowFinishConfirm] = useState(false)
 
   if (!activeSession) {
@@ -35,9 +36,15 @@ export default function Session() {
     )
   }
 
-  const filtered = exercises.filter((e) =>
-    e.name.toLowerCase().includes(search.toLowerCase())
-  )
+  // Унікальні групи м'язів для фільтра
+  const muscleGroups = ['Всі', ...Array.from(new Set(exercises.map(e => e.muscle_group))).sort()]
+
+  const filtered = exercises.filter((e) => {
+    const matchSearch = e.name.toLowerCase().includes(search.toLowerCase()) ||
+      e.muscle_group.toLowerCase().includes(search.toLowerCase())
+    const matchGroup = muscleFilter === 'Всі' || e.muscle_group === muscleFilter
+    return matchSearch && matchGroup
+  })
   const selected = exercises.find((e) => e.id === exerciseId)
 
   const handleAddSet = async () => {
@@ -95,8 +102,26 @@ export default function Session() {
           value={search}
           onChange={setSearch}
           placeholder="Пошук вправ..."
-          className="mb-3"
+          className="mb-2"
         />
+        {/* Фільтр по групі м'язів */}
+        <div className="flex gap-1.5 overflow-x-auto pb-2 mb-2 scrollbar-none">
+          {muscleGroups.map((group) => (
+            <button
+              key={group}
+              type="button"
+              onClick={() => setMuscleFilter(group)}
+              className={`shrink-0 px-3 py-1 rounded-full text-[11px] font-semibold transition-colors ${
+                muscleFilter === group
+                  ? 'text-white'
+                  : 'bg-surface-750 text-slate-500 hover:text-slate-300'
+              }`}
+              style={muscleFilter === group ? { background: 'rgb(var(--brand-500))' } : {}}
+            >
+              {group}
+            </button>
+          ))}
+        </div>
         {loadingExercises ? (
           <SkeletonList count={3} />
         ) : (
