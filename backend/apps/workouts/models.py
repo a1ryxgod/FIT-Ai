@@ -16,6 +16,14 @@ class WorkoutProgram(BaseModel):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="programs"
     )
     name = models.CharField(max_length=200)
+    assigned_to = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="assigned_programs",
+        help_text="User this program is assigned to (by trainer)",
+    )
 
     class Meta:
         ordering = ["-created_at"]
@@ -35,6 +43,27 @@ class Exercise(models.Model):
 
     def __str__(self):
         return f"{self.name} [{self.muscle_group}]"
+
+
+class ProgramExercise(BaseModel):
+    program = models.ForeignKey(
+        WorkoutProgram, on_delete=models.CASCADE, related_name="program_exercises"
+    )
+    exercise = models.ForeignKey(
+        Exercise, on_delete=models.CASCADE, related_name="program_exercises"
+    )
+    order = models.PositiveIntegerField(default=0)
+    target_sets = models.PositiveIntegerField(default=3)
+    target_reps = models.PositiveIntegerField(default=10)
+    target_weight = models.FloatField(default=0, help_text="kg")
+
+    class Meta:
+        ordering = ["order"]
+        unique_together = ("program", "exercise")
+        indexes = [models.Index(fields=["program", "order"])]
+
+    def __str__(self):
+        return f"{self.program.name} — {self.exercise.name} (#{self.order})"
 
 
 class WorkoutSession(BaseModel):

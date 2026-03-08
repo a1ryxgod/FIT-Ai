@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
 from .models import WorkoutProgram, WorkoutSession, WorkoutSet
@@ -15,7 +16,11 @@ def start_session(user, organization, program_id=None):
     program = None
     if program_id:
         program = get_object_or_404(
-            WorkoutProgram, pk=program_id, user=user, organization=organization
+            WorkoutProgram.objects.filter(
+                Q(user=user) | Q(assigned_to=user)
+            ),
+            pk=program_id,
+            organization=organization,
         )
 
     return WorkoutSession.objects.create(

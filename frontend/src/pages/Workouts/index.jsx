@@ -92,6 +92,7 @@ export default function Workouts() {
               key={program.id}
               program={program}
               onStart={() => handleStartSession(program.id)}
+              onClick={() => navigate(`/workouts/program/${program.id}`)}
               loading={startLoading}
             />
           ))}
@@ -118,16 +119,24 @@ export default function Workouts() {
   )
 }
 
-function ProgramCard({ program, onStart, loading }) {
+function ProgramCard({ program, onStart, onClick, loading }) {
   return (
     <Card className="flex items-center justify-between gap-3">
-      <div className="flex items-center gap-3 min-w-0">
+      <div className="flex items-center gap-3 min-w-0 cursor-pointer flex-1" onClick={onClick}>
         <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(var(--brand-500),0.1)', border: '1px solid rgba(var(--brand-500),0.15)' }}>
           <FolderOpen className="h-5 w-5 text-brand-400" />
         </div>
         <div className="min-w-0">
           <p className="font-semibold text-slate-100 text-small truncate">{program.name}</p>
-          <p className="text-caption text-slate-500">Створено {formatDate(program.created_at)}</p>
+          <p className="text-caption text-slate-500">
+            {program.exercise_count > 0
+              ? `${program.exercise_count} вправ`
+              : 'Немає вправ'
+            }
+            {program.assigned_to_username && (
+              <span className="ml-1 text-brand-400">· для {program.assigned_to_username}</span>
+            )}
+          </p>
         </div>
       </div>
       <Button size="sm" icon={Play} onClick={onStart} loading={loading} className="flex-shrink-0">

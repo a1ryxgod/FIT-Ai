@@ -60,6 +60,14 @@ class Membership(BaseModel):
         default=Role.MEMBER,
         db_index=True,
     )
+    trainer = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="training_clients",
+        help_text="Assigned trainer for this member",
+    )
 
     class Meta:
         unique_together = ("user", "organization")

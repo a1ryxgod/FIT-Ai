@@ -103,3 +103,75 @@ export function useExercises() {
     staleTime: 1000 * 60 * 30,
   })
 }
+
+// --- Program Exercises ---
+
+export function useProgramExercises(programId) {
+  return useQuery({
+    queryKey: ['program-exercises', programId],
+    queryFn: async () => {
+      const { data } = await workoutsApi.getProgramExercises(programId)
+      return data
+    },
+    enabled: !!programId,
+  })
+}
+
+export function useAddProgramExercise(programId) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (data) => workoutsApi.addProgramExercise(programId, data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['program-exercises', programId] })
+      qc.invalidateQueries({ queryKey: ['programs'] })
+      toast.success('Вправу додано')
+    },
+    onError: () => toast.error('Не вдалось додати вправу'),
+  })
+}
+
+export function useUpdateProgramExercise(programId) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, ...data }) => workoutsApi.updateProgramExercise(programId, id, data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['program-exercises', programId] })
+    },
+    onError: () => toast.error('Не вдалось оновити'),
+  })
+}
+
+export function useDeleteProgramExercise(programId) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (id) => workoutsApi.deleteProgramExercise(programId, id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['program-exercises', programId] })
+      qc.invalidateQueries({ queryKey: ['programs'] })
+      toast.success('Вправу видалено')
+    },
+    onError: () => toast.error('Не вдалось видалити'),
+  })
+}
+
+export function useReorderProgramExercises(programId) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (exerciseIds) => workoutsApi.reorderProgramExercises(programId, exerciseIds),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['program-exercises', programId] })
+    },
+  })
+}
+
+export function useLastPerformance(exerciseIds) {
+  return useQuery({
+    queryKey: ['last-performance', exerciseIds],
+    queryFn: async () => {
+      const { data } = await workoutsApi.getLastPerformance(exerciseIds)
+      return data
+    },
+    enabled: exerciseIds?.length > 0,
+    staleTime: 60_000,
+  })
+}
