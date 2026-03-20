@@ -73,3 +73,4 @@ htmlcov/
 
 # ─── Docker ───────────────────────────────────────────────────────────────────
 *.override.yml
+frontend/dev-dist/sw.js
